@@ -1,0 +1,45 @@
+name: branch-protection
+
+on:
+  pull-request:
+    types: [opened]
+    branches: [main, develop]
+
+jobs:
+  check-main:
+    if: github.base_ref == 'main'
+    runs_on: ubuntu-latest
+    steps:
+      - name: Check branch name
+        run: |
+          source_branch="${{ github.head_ref }}"
+          allowed_pattern="(^develop$|^hotfix\/.+)"
+
+          echo "Target: main"
+          echo "Source: $source_branch"
+
+          if [[ ! "$source_branch" =~ $allowed_pattern ]]; then
+            echo "Branch name '$source_branch' does not match the allowed pattern."
+            exit 1
+          else
+            echo "Branch name '$source_branch' is valid."
+          fi
+  
+  check-develop:
+    if: github.base_ref == 'develop'
+    runs_on: ubuntu-latest
+    steps:
+      - name: Check branch name
+        run: |
+          source_branch="${{ github.head_ref }}"
+          allowed_pattern="^(feature|fix|chore)\/.+"
+
+          echo "Target: develop"
+          echo "Source: $source_branch"
+
+          if [[ ! "$source_branch" =~ $allowed_pattern ]]; then
+            echo "Branch name '$source_branch' does not match the allowed pattern."
+            exit 1
+          else
+            echo "Branch name '$source_branch' is valid."
+          fi
