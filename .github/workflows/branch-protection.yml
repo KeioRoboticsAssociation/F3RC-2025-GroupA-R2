@@ -8,7 +8,7 @@ on:
 jobs:
   check-main:
     if: github.base_ref == 'main'
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check branch name
         run: |
@@ -27,7 +27,7 @@ jobs:
   
   check-develop:
     if: github.base_ref == 'develop'
-    runs_on: ubuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Check branch name
         run: |
