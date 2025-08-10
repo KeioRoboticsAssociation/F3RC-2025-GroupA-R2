@@ -5,7 +5,7 @@
 
 // N: 車輪の数
 //
-// OdomWheelは自己位置と目標位置を基にPID制御で目標速度を計算し、WheelControllerに渡す。
+// OdomWheelは自己位置と目標位置を基にPID制御で機体の目標速度を計算し、WheelControllerに渡す。
 // WheelControllerは入力された目標速度を各車輪の目標速度に変換し、MotorControllerに渡す。
 // MotorControllerはPID制御を行い入力された目標速度に近づける。
 template <int N>
