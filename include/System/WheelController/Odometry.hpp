@@ -1,7 +1,7 @@
 #pragma once
 #include "Wheel.hpp"
 #include "Driver/Encoder.hpp"
-#include "Eigen/Dense.h"
+#include <Dense.h>
 
 template <int N>
 class Odometry
