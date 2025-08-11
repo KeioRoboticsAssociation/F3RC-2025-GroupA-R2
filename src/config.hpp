@@ -1,8 +1,6 @@
 #pragma once
 #include <PinNames.h>
 
-
-
 namespace DigitalOutPins
 {
     constexpr PinName OMUNI_MOTOR1_DIR  = PB_10;     // オムニホイールDC1の方向
