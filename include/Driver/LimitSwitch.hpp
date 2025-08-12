@@ -7,7 +7,8 @@
 /**
  * @brief OMRON SS-10GL13 マイクロスイッチドライバクラス
  * 
-
+ * This class provides an interface to interact with the OMRON SS-10GL13 micro switch,
+ * including initialization, debouncing, and edge detection functionalities.
  * 
  * @author R2開発チーム
  * @date 2025-08-11
