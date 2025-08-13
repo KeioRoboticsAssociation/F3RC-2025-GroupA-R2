@@ -55,6 +55,14 @@ public:
         }
     }
 
+    void stop()
+    {
+        for (int i = 0; i < N; i++)
+        {
+            motors[i]->stop();
+        }
+    }
+
 private:
     std::array<WheelVector, N> wheel_vectors;
     float max_speed;

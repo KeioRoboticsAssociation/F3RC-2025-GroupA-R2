@@ -42,6 +42,11 @@ public:
         return target_pose;
     }
 
+    void stop()
+    {
+        wheel_controller.stop();
+    }
+
     PIDController<Pose> pid_controller;
     WheelController<N> wheel_controller;
     Odometry<N> odometry;
