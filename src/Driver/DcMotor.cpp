@@ -1,4 +1,4 @@
-#include "Driver/DCMotor.hpp"
+#include "Driver/DcMotor.hpp"
 
 // モータードライバーの仕様に合わせて定義（例：0が正転、1が逆転）
 constexpr int FORWARD_DIR_STATE = 0;
