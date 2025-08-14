@@ -6,10 +6,10 @@ LimitSwitch::LimitSwitch(PinName pin) : digitalIn(pin), lastState(false), curren
 }
 
 void LimitSwitch::init() {
-    // SS-10GL13専用プルアップ設定
-    // COM → Mbedピン, NO → GND の配線構成
-    // 非押下時: プルアップでHIGH (3.3V)
-    // 押下時: NO-COM間導通でLOW (0V)
+    // SS-10GL13専用設定
+    // COM → Mbedピン, NC → GND の配線構成
+    // 非押下時: NC-COM間導通でLOW (0V)
+    // 押下時: NC-COM間切断、プルアップでHIGH (3.3V)
     digitalIn.mode(PullUp);
     
     // SS-10GL13の安定化待機
@@ -17,7 +17,7 @@ void LimitSwitch::init() {
     ThisThread::sleep_for(chrono::milliseconds(STABILIZE_TIME_MS));
     
     // 初期状態を安定的に取得
-    bool initialRawState = !digitalIn.read();  // プルアップ構成なので論理反転
+    bool initialRawState = digitalIn.read(); 
     currentState = initialRawState;
     lastState = initialRawState;
     lastEdgeState = initialRawState;
@@ -27,8 +27,8 @@ void LimitSwitch::init() {
 }
 
 bool LimitSwitch::isPressed() {
-    // 生入力値取得 (プルアップなので論理反転)
-    bool rawState = !digitalIn.read();
+    // 生入力値取得
+    bool rawState = digitalIn.read();
     
     // SS-10GL13専用デバウンス処理
     return debounce(rawState);
@@ -47,8 +47,8 @@ bool LimitSwitch::isPressedEdge() {
 }
 
 bool LimitSwitch::getRawInput() {
-    // デバッグ用: 生の入力値 (論理反転済み)
-    return !digitalIn.read();
+    // デバッグ用: 生の入力値 
+    return digitalIn.read();
 }
 
 bool LimitSwitch::debounce(bool rawState) {
