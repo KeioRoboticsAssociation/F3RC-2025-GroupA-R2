@@ -1,0 +1,153 @@
+connectivity/*
+# connectivity/lwipstack
+# connectivity/mbedtls
+# connectivity/nanostack
+# connectivity/netsocket
+# connectivity/nfc
+
+# connectivity/drivers/802.15.4_RF
+# connectivity/drivers/ble
+# connectivity/drivers/cellular
+# connectivity/drivers/emac
+# connectivity/drivers/lora
+# connectivity/drivers/mbedtls
+# connectivity/drivers/nfc
+# connectivity/drivers/wifi
+
+# connectivity/libraries/mbed-coap
+# connectivity/libraries/nanostack-libservice
+# connectivity/libraries/ppp
+
+
+# drivers/device_key
+drivers/usb
+drivers/tests
+
+
+features/*
+# features/FEATURE_BOOTLOADER
+
+# features/frameworks/COMPONENT_FPGA_CI_TEST_SHIELD
+# features/frameworks/greentea-client
+# features/frameworks/mbed-client-cli
+# features/frameworks/unity
+# features/frameworks/utest
+
+
+hal/usb
+hal/tests
+
+
+platform/bare_metal
+platform/cxxsupport
+platform/FEATURE_EXPERIMENTAL_API
+platform/mbed-trace
+platform/randlib
+platform/tests
+
+
+rtos/*
+
+
+storage/*
+# storage/blockdevice
+# storage/filesystem
+# storage/kvstore
+# storage/platform
+
+
+TESTS
+UNITTESTS
+
+
+# ディレクトリの概要(抜けがあるので注意)
+# windows: C:/Users/(username)/.platformio/packages/framework-mbed/
+# ubuntu: /root/.platformio/packages/framework-mbed/
+# ├── connectivity
+# │   ├── cellular
+# │   ├── drivers
+# │   │   ├── 802.15.4_RF
+# │   │   ├── ble
+# │   │   ├── cellular
+# │   │   ├── emac
+# │   │   ├── lora
+# │   │   ├── mbedtls
+# │   │   ├── nfc
+# │   │   └── wifi
+# │   ├── FEATURE_BLE
+# │   │   ├── libraries
+# │   │   │   ├── cordio_stack
+# │   │   │   │   ├── ble-host
+# │   │   │   │   ├── platform
+# │   │   │   │   └── wsf
+# │   ├── libraries
+# │   │   ├── mbed-coap
+# │   │   ├── nanostack-libservice
+# │   │   ├── ppp
+# │   ├── lorawan
+# │   ├── lwipstack
+# │   ├── mbedtls
+# │   ├── nanostack
+# │   ├── netsocket
+# │   └── nfc
+# ├── doxyfile_options
+# ├── drivers
+# │   ├── device_key
+# │   └── usb
+# ├── events
+# ├── extern
+# ├── features
+# │   ├── deprecated_warnings
+# │   ├── FEATURE_BOOTLOADER
+# │   └── frameworks
+# │       ├── COMPONENT_FPGA_CI_TEST_SHIELD
+# │       ├── greentea-client
+# │       ├── mbed-client-cli
+# │       ├── mbed-greentea-io
+# │       ├── unity
+# ├── hal
+# │   └── usb
+# ├── platform
+# │   ├── bare_metal
+# │   ├── cxxsupport
+# │   │   ├── mstd_algorithm
+# │   │   ├── mstd_atomic
+# │   │   ├── mstd_cstddef
+# │   │   ├── mstd_functional
+# │   │   ├── mstd_iterator
+# │   │   ├── mstd_memory
+# │   │   ├── mstd_mutex
+# │   │   ├── mstd_new
+# │   │   ├── mstd_span
+# │   │   ├── mstd_tuple
+# │   │   ├── mstd_type_traits
+# │   │   ├── mstd_utility
+# │   ├── FEATURE_EXPERIMENTAL_API
+# │   ├── mbed-trace
+# │   ├── randlib
+# ├── platformio
+# │   ├── package_deps
+# ├── rtos
+# ├── storage
+# │   ├── blockdevice
+# │   │   ├── COMPONENT_FLASHIAP
+# │   │   ├── COMPONENT_I2CEE
+# │   │   ├── COMPONENT_OSPIF
+# │   │   ├── COMPONENT_QSPIF
+# │   │   ├── COMPONENT_SD
+# │   │   ├── COMPONENT_SPIF
+# │   │   ├── COMPONENT_SPINAND
+# │   │   ├── include
+# │   ├── filesystem
+# │   │   ├── fat
+# │   │   ├── littlefs
+# │   │   ├── littlefsv2
+# │   ├── kvstore
+# │   │   ├── direct_access_devicekey
+# │   │   ├── filesystemstore
+# │   │   ├── kvstore_global_api
+# │   │   ├── securestore
+# │   │   ├── tdbstore
+# │   └── platform
+# ├── TESTS
+# └── UNITTESTS
