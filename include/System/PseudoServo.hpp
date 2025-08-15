@@ -1,13 +1,13 @@
 #pragma once
 #include <mbed.h>
-#include "Driver/DcMotor.hpp"
+#include "Driver/DCMotor.hpp"
 #include "Driver/Encoder.hpp"
 #include "Driver/LimitSwitch.hpp"
 
 
 class PseudoServo {
 public:
-    PseudoServo(DcMotor& m, Encoder& e, LimitSwitch& sw, float min_a, float max_a)；
+    PseudoServo(DCMotor& m, Encoder& e, LimitSwitch& sw, float min_a, float max_a);
     void init();
     bool home();
     void setAngleDeg(float degrees);
@@ -18,7 +18,7 @@ public:
 
 
 private:
-    DcMotor& _m;
+    DCMotor& _m;
     Encoder& _e;
     LimitSwitch& _sw;
     float _min_a;
