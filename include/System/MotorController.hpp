@@ -1,5 +1,5 @@
 #pragma once
-#include "Driver/DcMotor.hpp"
+#include "Driver/DCMotor.hpp"
 #include "Driver/Encoder.hpp"
 #include "PIDController.hpp"
 
