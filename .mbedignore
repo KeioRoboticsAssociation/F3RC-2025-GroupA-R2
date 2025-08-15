@@ -60,7 +60,7 @@ TESTS
 UNITTESTS
 
 
-# ディレクトリの概要(抜けがあるので注意)
+# Summary of directories (note that there are omissions)
 # windows: C:/Users/(username)/.platformio/packages/framework-mbed/
 # ubuntu: /root/.platformio/packages/framework-mbed/
 # ├── connectivity
