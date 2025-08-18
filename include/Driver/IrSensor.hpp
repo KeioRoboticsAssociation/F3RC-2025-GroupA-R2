@@ -5,8 +5,9 @@
 
 class IRSensor {
     public:
-        IRSensor(PinName pin);
-        bool isDetected(); // WTT12L-B1531 が物体検知型のため
+        IRSensor(PinName out);
+        void init();
+        bool isDetecting();
     private:
         DigitalIn _sensorPin;
 };

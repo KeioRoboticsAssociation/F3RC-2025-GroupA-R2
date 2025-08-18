@@ -1,7 +1,11 @@
 #include "Driver/IrSensor.hpp"
 
-IRSensor::IRSensor(PinName pin) : _sensorPin(pin) {}
+IRSensor::IRSensor(PinName out) : _sensorPin(out) {}
 
-bool IRSensor::isDetected() {
-    return _sensorPin.read();
+void IRSensor::init() {
+    _sensorPin.mode(PullUp);
+}
+
+bool IRSensor::isDetecting() {
+    return _sensorPin;
 }
