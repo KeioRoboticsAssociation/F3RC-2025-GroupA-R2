@@ -55,10 +55,10 @@ private:
     PIDController<double> x_pid_controller;
     PIDController<double> y_pid_controller;
     PIDController<double> angle_pid_controller;
-    // updateBehaviorで扱うx, yの目標が位置か速度のどちらなのか。
+    // calculateTargetVelocityで扱うx, yの目標が位置か速度のどちらなのか。
     // true: 位置, false: 速度
     TargetMode xy_target_mode;
-    // updateBehaviorで扱うangleの目標が位置か速度のどちらなのか。
+    // calculateTargetVelocityで扱うangleの目標が位置か速度のどちらなのか。
     // true: 位置, false: 速度
     TargetMode angle_target_mode;
 };
