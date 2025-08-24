@@ -46,7 +46,7 @@ platform/randlib
 platform/tests
 
 
-rtos/*
+# rtos/*
 
 
 storage/*
