@@ -1,5 +1,5 @@
 #pragma once
-#include "Driver/DCMotor.hpp"
+#include "Driver/DcMotor.hpp"
 #include "Driver/Encoder.hpp"
 #include "PIDController.hpp"
 
@@ -7,11 +7,11 @@
 class MotorController
 {
 public:
-    DCMotor &motor;
+    DcMotor &motor;
     Encoder &encoder;
     PIDController<float> pid_controller;
 
-    MotorController(DCMotor &motor, Encoder &encoder, PIDGain pid_gain = PIDGain{0.13, 0.0, 0.0, 20}, float max_duty = 1.0);
+    MotorController(DcMotor &motor, Encoder &encoder, PIDGain pid_gain = PIDGain{0.13, 0.0, 0.0, 20}, float max_duty = 1.0);
     void setTargetSpeed(float target_rps);
     void stop();
     float getSpeed();

@@ -1,6 +1,6 @@
 #include "System/MotorController.hpp"
 
-MotorController::MotorController(DCMotor &motor, Encoder &encoder, PIDGain pid_gain, float max_duty)
+MotorController::MotorController(DcMotor &motor, Encoder &encoder, PIDGain pid_gain, float max_duty)
     : motor(motor), encoder(encoder), pid_controller(pid_gain)
 {
     ticker.attach(callback(this, &MotorController::loop), 1s / pid_controller.getFrequency());
