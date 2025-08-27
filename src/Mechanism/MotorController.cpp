@@ -1,4 +1,4 @@
-#include "System/MotorController.hpp"
+#include "Mechanism/MotorController.hpp"
 
 MotorController::MotorController(DCMotor &motor, Encoder &encoder, PIDGain pid_gain, float max_duty)
     : motor(motor), encoder(encoder), pid_controller(pid_gain)

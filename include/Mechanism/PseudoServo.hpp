@@ -1,8 +1,8 @@
 #pragma once
 #include <mbed.h>
-#include "Driver/DCMotor.hpp"
-#include "Driver/Encoder.hpp"
-#include "Driver/LimitSwitch.hpp"
+#include "Parts/DCMotor.hpp"
+#include "Parts/Encoder.hpp"
+#include "Parts/LimitSwitch.hpp"
 
 
 class PseudoServo {

@@ -1,4 +1,4 @@
-#include "System/PseudoServo.hpp"
+#include "Mechanism/PseudoServo.hpp"
 
 PseudoServo::PseudoServo(DCMotor& m, Encoder& e, LimitSwitch& sw, float min_a, float max_a)
     : _m(m), _e(e), _sw(sw), _min_a(min_a), _max_a(max_a),_is_homed(false),_target_angle_deg(0.0f) {}

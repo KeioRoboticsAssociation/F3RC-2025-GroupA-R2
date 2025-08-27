@@ -1,4 +1,4 @@
-#include "Driver/Encoder.hpp"
+#include "Parts/Encoder.hpp"
 
 Encoder::Encoder(PinName interrupt_in_pin, PinName digital_in_pin, int resolution, bool reverse_dir, bool is_dual) : digital_in(digital_in_pin), interrupt_in(interrupt_in_pin)
 {

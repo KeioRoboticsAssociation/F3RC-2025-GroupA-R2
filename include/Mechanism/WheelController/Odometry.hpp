@@ -1,6 +1,6 @@
 #pragma once
 #include "Wheel.hpp"
-#include "Driver/Encoder.hpp"
+#include "Parts/Encoder.hpp"
 #include <Dense.h>
 
 template <int N>

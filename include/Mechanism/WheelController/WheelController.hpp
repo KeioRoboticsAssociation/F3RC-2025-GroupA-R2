@@ -1,6 +1,6 @@
 #pragma once
 #include "Wheel.hpp"
-#include "System/MotorController.hpp"
+#include "Mechanism/MotorController.hpp"
 
 // N: 車輪の数
 // OdomWheelにおいてPID制御を用いて求めた機体の目標速度ベクトル(Twist)を入力し、それぞれの車輪の目標速度を計算してMotorControllerに渡す。

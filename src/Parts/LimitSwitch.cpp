@@ -1,4 +1,4 @@
-#include "Driver/LimitSwitch.hpp"
+#include "Parts/LimitSwitch.hpp"
 
 LimitSwitch::LimitSwitch(PinName pin) : digitalIn(pin), lastState(false), currentState(false), lastEdgeState(false) {
     // タイマー開始
