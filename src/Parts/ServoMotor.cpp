@@ -1,4 +1,4 @@
-#include "Driver/ServoMotor.hpp"
+#include "Parts/ServoMotor.hpp"
 #include <cmath>
 
 Servo::Servo(PinName pwm_pin, chrono::microseconds min_pulse_width, chrono::microseconds max_pulse_width, chrono::milliseconds pwm_period)

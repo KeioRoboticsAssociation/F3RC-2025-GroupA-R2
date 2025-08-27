@@ -1,5 +1,5 @@
 #include "Actuator/BehaviorController.hpp"
-#include "System/WheelController/Wheel.hpp"
+#include "Mechanism/WheelController/Wheel.hpp"
 
 BehaviorController::BehaviorController(PIDGain x_pid_gain, PIDGain y_pid_gain, PIDGain angle_pid_gain)
     : x_pid_controller(x_pid_gain), y_pid_controller(y_pid_gain), angle_pid_controller(angle_pid_gain) {}

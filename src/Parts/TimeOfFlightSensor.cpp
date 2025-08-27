@@ -1,4 +1,4 @@
-#include "Driver/TimeOfFlightSensor.hpp"
+#include "Parts/TimeOfFlightSensor.hpp"
 
 TimeOfFlightSensor::TimeOfFlightSensor(PinName q1, PinName q2) : _sensorPin1(q1), _sensorPin2(q2) {}
 

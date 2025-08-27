@@ -1,5 +1,5 @@
 #pragma once
-#include "System/WheelController/WheelController.hpp"
+#include "Mechanism/WheelController/WheelController.hpp"
 
 template <int N>
 class DriveTrain

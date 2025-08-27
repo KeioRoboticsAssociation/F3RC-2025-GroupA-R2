@@ -1,6 +1,6 @@
 #pragma once
-#include "Driver/DCMotor.hpp"
-#include "Driver/Encoder.hpp"
+#include "Parts/DCMotor.hpp"
+#include "Parts/Encoder.hpp"
 #include "PIDController.hpp"
 
 // PID制御を用いてDCモーターの出力を制御するクラス

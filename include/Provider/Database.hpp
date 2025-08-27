@@ -1,8 +1,8 @@
 #pragma once
 #include <utility>
-#include "Driver/Imu.hpp"
-#include "Driver/LimitSwitch.hpp"
-#include "Driver/TimeOfFlightSensor.hpp"
+#include "Parts/Imu.hpp"
+#include "Parts/LimitSwitch.hpp"
+#include "Parts/TimeOfFlightSensor.hpp"
 
 class Database
 {
