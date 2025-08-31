@@ -7,7 +7,7 @@
 class Database
 {
 public:
-    Database(Imu &imu, TimeOfFlightSensor front_time_of_flight_sensor, TimeOfFlightSensor side_time_of_flight_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch);
+    Database(Imu &imu, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch);
     // x, y方向の加速度[m/s^2]を取得する
     std::pair<double, double> getAcceleration();
     // 角速度[rad/s]を取得する
@@ -21,8 +21,8 @@ public:
 
 private:
     Imu &imu;
-    TimeOfFlightSensor front_time_of_flight_sensor;
-    TimeOfFlightSensor side_time_of_flight_sensor;
+    TimeOfFlightSensor front_tof_sensor;
+    TimeOfFlightSensor side_tof_sensor;
     LimitSwitch front_limit_switch;
     LimitSwitch side_limit_switch;
 };

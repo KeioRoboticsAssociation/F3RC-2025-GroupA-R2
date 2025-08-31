@@ -1,8 +1,8 @@
 #include "Provider/Database.hpp"
 #include <math.h>
 
-Database::Database(Imu &imu, TimeOfFlightSensor front_time_of_flight_sensor, TimeOfFlightSensor side_time_of_flight_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch)
-    : imu(imu), front_time_of_flight_sensor(front_time_of_flight_sensor), side_time_of_flight_sensor(side_time_of_flight_sensor), front_limit_switch(front_limit_switch), side_limit_switch(side_limit_switch)
+Database::Database(Imu &imu, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch)
+    : imu(imu), front_tof_sensor(front_tof_sensor), side_tof_sensor(side_tof_sensor), front_limit_switch(front_limit_switch), side_limit_switch(side_limit_switch)
 {
     this->imu.init();
     front_limit_switch.init();
@@ -23,12 +23,12 @@ double Database::getAngularVelocity()
 
 bool Database::getFrontTofStatus()
 {
-    return front_time_of_flight_sensor.isDetecting_1();
+    return front_tof_sensor.isDetecting();
 }
 
 bool Database::getSideTofStatus()
 {
-    return front_time_of_flight_sensor.isDetecting_1();
+    return side_tof_sensor.isDetecting();
 }
 
 bool Database::getFrontLimitSwitchStatus()
