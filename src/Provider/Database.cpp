@@ -23,7 +23,7 @@ double Database::getAngularVelocity()
 
 bool Database::getFrontTofStatus()
 {
-    return front_time_of_flight_sensor.isDetecting_1();
+    return front_time_of_flight_sensor.isDetecting();
 }
 
 bool Database::getSideTofStatus()
