@@ -63,8 +63,8 @@ namespace DigitalInPins
 
 namespace PinsForSensor
 {
-    constexpr PinName IMU_RX = PA_0 ;
-    constexpr PinName IMU_TX = PA_1 ;
+    constexpr PinName IMU_RX = PC_11 ;
+    constexpr PinName IMU_TX = PC_10 ;
 
     constexpr PinName IR1    = PB_14;
     constexpr PinName IR2    = PB_13;
