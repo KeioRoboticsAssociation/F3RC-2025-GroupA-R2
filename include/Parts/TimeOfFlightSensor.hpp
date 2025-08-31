@@ -17,7 +17,7 @@ class TimeOfFlightSensor {
          * 
          * @param out センサーの出力ピン
          */
-        TimeOfFlightSensor(PinName q1, PinName q2);
+        TimeOfFlightSensor(PinName q1);
 
         /** 
          * @brief センサーの初期化
@@ -30,11 +30,9 @@ class TimeOfFlightSensor {
          * @return true 物体が検知された場合
          * @return false 物体が検知されなかった場合
          */
-        bool isDetecting_1();
-        bool isDetecting_2();
+        bool isDetecting();
     private:
-        DigitalIn _sensorPin1;
-        DigitalIn _sensorPin2;
+        DigitalIn _sensorPin;
 };
 
 #endif /* TIMEOFFLIGHTSENSOR_HPP */
