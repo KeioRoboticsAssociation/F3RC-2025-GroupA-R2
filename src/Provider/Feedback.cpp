@@ -11,7 +11,7 @@ Feedback::Feedback(Database& db, ImuOdometry& odometry_calculator)
 }
 
 Pose2D Feedback::getPosition(int frame_num) {
-    if (frame_num < 0 || frame_num >= coordinate_systems.size()) {
+    if (frame_num < 0 || static_cast<size_t>(frame_num) >= coordinate_systems.size()) {
         // エラー処理: 不正な座標系番号の場合は、現在の座標系での姿勢を返す
         frame_num = current_coordinate_system_num;
     }
