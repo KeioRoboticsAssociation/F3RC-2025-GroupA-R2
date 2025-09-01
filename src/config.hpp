@@ -75,8 +75,8 @@ namespace LimitSwitchPins
 
 namespace PinsForSensor
 {
-    constexpr PinName IMU_RX    = PC_10 ;
-    constexpr PinName IMU_TX    = PC_11 ;
+    constexpr PinName IMU_RX    = PC_11 ;
+    constexpr PinName IMU_TX    = PC_10 ;
 
     constexpr PinName IMU_SDA   = PC_12 ;
     constexpr PinName IMU_SCL   = PB_10 ;
