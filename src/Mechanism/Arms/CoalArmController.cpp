@@ -1,4 +1,4 @@
-#include "Mechanism/CoalArmController.hpp"
+#include "Mechanism/Arms/CoalArmController.hpp"
 #include "config.hpp"
 
 CoalArmController::CoalArmController(PseudoServo& armServo, Servo& gripServo)

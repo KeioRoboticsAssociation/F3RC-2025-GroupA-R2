@@ -2,7 +2,7 @@
 #define COAL_ARM_CONTROLLER_HPP
 
 #include "Parts/ServoMotor.hpp"
-#include "Mechanism/PseudoServo.hpp"
+#include "Mechanism/Arms/PseudoServo.hpp"
 
 class CoalArmController {
 public:
