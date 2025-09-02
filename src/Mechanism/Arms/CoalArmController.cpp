@@ -1,5 +1,6 @@
 #include "Mechanism/Arms/CoalArmController.hpp"
 #include "config.hpp"
+#include "variable.hpp"
 
 CoalArmController::CoalArmController(PseudoServo& armServo, Servo& gripServo)
     : _arm(armServo), _grip(gripServo), _state(State::Idle) {}
