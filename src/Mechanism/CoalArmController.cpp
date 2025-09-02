@@ -10,23 +10,29 @@ void CoalArmController::init() {
 }
 
 void CoalArmController::collect() {
-    if (CoalArmController::isBusy()) {
+    if (isBusy()) {
+        _pending = Command::Collect;
+    } else {
         _state = State::Collect_ArmDown;
         _state_timer.reset();
         _state_timer.start();
+        _pending = Command::None;
     }
 }
 
 void CoalArmController::place() {
-    if (CoalArmController::isBusy()) {
+    if (isBusy()) {
+        _pending = Command::Place;
+    } else {
         _state = State::Place_ArmDown;
         _state_timer.reset();
         _state_timer.start();
+        _pending = Command::None;
     }
 }
 
 bool CoalArmController::isBusy() const {
-    return _state != State::Idle && _state != State::EmergencyStop;
+    return _state != State::Idle;
 }
 
 void CoalArmController::stop() {
@@ -36,6 +42,7 @@ void CoalArmController::stop() {
     _state_timer.stop();
 }
 
+/*! 外部の Ticker から呼び出すこと！！！ */
 void CoalArmController::update() {
     switch (_state) {
         case State::Init:
@@ -90,7 +97,12 @@ void CoalArmController::update() {
             break;
         case State::EmergencyStop:
             break;
-        default:
+        case State::Idle:
+            if (_pending == Command::Collect) {
+                collect();
+            } else if (_pending == Command::Place) {
+                place();
+            }
             break;
     }
 }

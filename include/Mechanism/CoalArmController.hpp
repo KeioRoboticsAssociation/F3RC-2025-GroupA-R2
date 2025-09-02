@@ -29,8 +29,14 @@ private:
         Place_ArmUp,
         EmergencyStop
     };
-    
     State _state;
+    enum class Command {
+        None,
+        Collect,
+        Place
+    };
+    Command _pending;
+    
     PseudoServo& _arm;
     Servo& _grip;
 
