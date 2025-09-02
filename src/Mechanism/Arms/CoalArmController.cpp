@@ -56,42 +56,42 @@ void CoalArmController::update() {
             break;
         case State::Collect_ArmDown:
             _arm.setAngleDeg(CoalArmParameter::ARM_DOWN_ANGLE);
-            if (_arm.getAngleDeg() <= CoalArmParameter::ARM_DOWN_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
+            if (_arm.getAngleDeg() <= CoalArmParameter::ARM_DOWN_THRESHOLD || std::chrono::duration_cast<std::chrono::milliseconds>(_state_timer.elapsed_time()).count() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Collect_GripClose;
                 _state_timer.reset();
             }
             break;
         case State::Collect_GripClose:
             _grip.setAngleDeg(CoalArmParameter::GRIP_CLOSE_ANGLE);
-            if (_state_timer.read_ms() > CoalArmParameter::GRIP_ACTION_TIMEOUT_MS) {
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(_state_timer.elapsed_time()).count() > CoalArmParameter::GRIP_ACTION_TIMEOUT_MS) {
                 _state = State::Collect_ArmUp;
                 _state_timer.reset();
             }
             break;
         case State::Collect_ArmUp:
             _arm.setAngleDeg(CoalArmParameter::ARM_UP_ANGLE);
-            if (_arm.getAngleDeg() >= CoalArmParameter::ARM_UP_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
+            if (_arm.getAngleDeg() >= CoalArmParameter::ARM_UP_THRESHOLD || std::chrono::duration_cast<std::chrono::milliseconds>(_state_timer.elapsed_time()).count() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Idle;
                 _state_timer.stop();
             }
             break;
         case State::Place_ArmDown:
             _arm.setAngleDeg(CoalArmParameter::ARM_DOWN_ANGLE);
-            if (_arm.getAngleDeg() <= CoalArmParameter::ARM_DOWN_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
+            if (_arm.getAngleDeg() <= CoalArmParameter::ARM_DOWN_THRESHOLD || std::chrono::duration_cast<std::chrono::milliseconds>(_state_timer.elapsed_time()).count() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Place_GripOpen;
                 _state_timer.reset();
             }
             break;
         case State::Place_GripOpen:
             _grip.setAngleDeg(CoalArmParameter::GRIP_OPEN_ANGLE);
-            if (_state_timer.read_ms() > CoalArmParameter::GRIP_ACTION_TIMEOUT_MS) {
+            if (std::chrono::duration_cast<std::chrono::milliseconds>(_state_timer.elapsed_time()).count() > CoalArmParameter::GRIP_ACTION_TIMEOUT_MS) {
                 _state = State::Place_ArmUp;
                 _state_timer.reset();
             }
             break;
         case State::Place_ArmUp:
             _arm.setAngleDeg(CoalArmParameter::ARM_UP_ANGLE);
-            if (_arm.getAngleDeg() >= CoalArmParameter::ARM_UP_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
+            if (_arm.getAngleDeg() >= CoalArmParameter::ARM_UP_THRESHOLD || std::chrono::duration_cast<std::chrono::milliseconds>(_state_timer.elapsed_time()).count() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Idle;
                 _state_timer.stop();
             }
