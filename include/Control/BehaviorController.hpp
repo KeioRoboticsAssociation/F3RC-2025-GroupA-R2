@@ -1,7 +1,6 @@
 #pragma once
-
 #include "Mechanism/PIDController.hpp"
-#include "Mechanism/WheelController/Wheel.hpp"
+#include "Provider/Wheel.hpp"
 
 enum class TargetMode
 {
