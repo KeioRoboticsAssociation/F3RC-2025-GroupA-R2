@@ -32,4 +32,11 @@ namespace CoalArmParameter {
     constexpr int GRIP_ACTION_TIMEOUT_MS = 1000;
 }
 
+namespace BehaviorControllerParameter {
+    // PIDゲイン設定
+    constexpr PIDGain x_gain{1.0, 0.0, 0.1};
+    constexpr PIDGain y_gain{1.0, 0.0, 0.1};
+    constexpr PIDGain angle_gain{1.0, 0.0, 0.1};
+
+}
 #endif // INCLUDED_VARIABLE_HPP_
