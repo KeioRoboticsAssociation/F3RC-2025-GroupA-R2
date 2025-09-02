@@ -1,4 +1,5 @@
 #include "Mechanism/CoalArmController.hpp"
+#include "config.hpp"
 
 CoalArmController::CoalArmController(PseudoServo& armServo, Servo& gripServo)
     : _arm(armServo), _grip(gripServo), _state(State::Idle) {}
@@ -37,7 +38,7 @@ bool CoalArmController::isBusy() const {
 
 void CoalArmController::stop() {
     _arm.home();
-    _grip.setAngleDeg(0.0f);
+    _grip.setAngleDeg(CoalArmParameter::GRIP_OPEN_ANGLE);
     _state = State::EmergencyStop;
     _state_timer.stop();
 }
@@ -47,50 +48,50 @@ void CoalArmController::update() {
     switch (_state) {
         case State::Init:
             _arm.init();
-            _grip.setAngleDeg(0.0f);
+            _grip.setAngleDeg(CoalArmParameter::GRIP_OPEN_ANGLE);
             if (_arm.isHomed()) {
                 _state = State::Idle;
                 _state_timer.stop();
             }
             break;
         case State::Collect_ArmDown:
-            _arm.setAngleDeg(-45.0f);
-            if (_arm.getAngleDeg() <= -44.0f || _state_timer.read_ms() > 3000) {
+            _arm.setAngleDeg(CoalArmParameter::ARM_DOWN_ANGLE);
+            if (_arm.getAngleDeg() <= CoalArmParameter::ARM_DOWN_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Collect_GripClose;
                 _state_timer.reset();
             }
             break;
         case State::Collect_GripClose:
-            _grip.setAngleDeg(45.0f);
-            if (_state_timer.read_ms() > 1000) {
+            _grip.setAngleDeg(CoalArmParameter::GRIP_CLOSE_ANGLE);
+            if (_state_timer.read_ms() > CoalArmParameter::GRIP_ACTION_TIMEOUT_MS) {
                 _state = State::Collect_ArmUp;
                 _state_timer.reset();
             }
             break;
         case State::Collect_ArmUp:
-            _arm.setAngleDeg(0.0f);
-            if (_arm.getAngleDeg() >= -1.0f || _state_timer.read_ms() > 3000) {
+            _arm.setAngleDeg(CoalArmParameter::ARM_UP_ANGLE);
+            if (_arm.getAngleDeg() >= CoalArmParameter::ARM_UP_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Idle;
                 _state_timer.stop();
             }
             break;
         case State::Place_ArmDown:
-            _arm.setAngleDeg(-45.0f);
-            if (_arm.getAngleDeg() <= -44.0f || _state_timer.read_ms() > 3000) {
+            _arm.setAngleDeg(CoalArmParameter::ARM_DOWN_ANGLE);
+            if (_arm.getAngleDeg() <= CoalArmParameter::ARM_DOWN_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Place_GripOpen;
                 _state_timer.reset();
             }
             break;
         case State::Place_GripOpen:
-            _grip.setAngleDeg(0.0f);
-            if (_state_timer.read_ms() > 1000) {
+            _grip.setAngleDeg(CoalArmParameter::GRIP_OPEN_ANGLE);
+            if (_state_timer.read_ms() > CoalArmParameter::GRIP_ACTION_TIMEOUT_MS) {
                 _state = State::Place_ArmUp;
                 _state_timer.reset();
             }
             break;
         case State::Place_ArmUp:
-            _arm.setAngleDeg(0.0f);
-            if (_arm.getAngleDeg() >= -1.0f || _state_timer.read_ms() > 3000) {
+            _arm.setAngleDeg(CoalArmParameter::ARM_UP_ANGLE);
+            if (_arm.getAngleDeg() >= CoalArmParameter::ARM_UP_THRESHOLD || _state_timer.read_ms() > CoalArmParameter::ARM_MOVE_TIMEOUT_MS) {
                 _state = State::Idle;
                 _state_timer.stop();
             }

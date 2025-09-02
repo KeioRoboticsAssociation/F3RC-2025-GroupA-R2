@@ -84,3 +84,23 @@ namespace PinsForSensor
     constexpr PinName TOF1      = PC_1 ;       // 前方TOFセンサー
     constexpr PinName TOF2      = PC_0 ;       // 側方TOFセンサー
 }
+
+
+
+namespace CoalArmParameter {
+    // 角度（度）
+    constexpr float ARM_INIT_ANGLE = 0.0f;
+    constexpr float ARM_DOWN_ANGLE = -45.0f;
+    constexpr float ARM_UP_ANGLE   = 0.0f;
+
+    constexpr float GRIP_OPEN_ANGLE  = 0.0f;
+    constexpr float GRIP_CLOSE_ANGLE = 45.0f;
+
+    // 許容誤差
+    constexpr float ARM_DOWN_THRESHOLD = -44.0f;
+    constexpr float ARM_UP_THRESHOLD   = -1.0f;
+
+    // タイマー（ms）
+    constexpr int ARM_MOVE_TIMEOUT_MS   = 3000;
+    constexpr int GRIP_ACTION_TIMEOUT_MS = 1000;
+}
