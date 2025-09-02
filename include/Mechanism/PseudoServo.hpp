@@ -13,6 +13,7 @@ public:
     void setAngleDeg(float degrees);
     float getAngleDeg();
     bool isHomed();
+    bool is_moving();
     void update();
 
 
