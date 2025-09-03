@@ -1,4 +1,5 @@
 #include "Control/BehaviorController.hpp"
+#include "config.hpp"
 #include <cmath> 
 
 
@@ -129,25 +130,25 @@ Twist BehaviorController::calculateTargetVelocity()
 }
 
 // オムニホイールの配置を設定
-float WHEEL_RAD = 45.0; // 車輪の半径
-float TREAD_RAD = 210.0; // 中心から車輪までの距離
+float WHEEL_RAD_ = BehaviorControllerParameter::WHEEL_RAD; // 車輪の半径
+float TREAD_RAD_ = BehaviorControllerParameter::TREAD_RAD; // 中心から車輪までの距離
 std::array<WheelConfig, 3> config = {
     WheelConfig{
-        .wheel_radius = WHEEL_RAD, // 車輪の半径
+        .wheel_radius = WHEEL_RAD_, // 車輪の半径
         .wheel_x = 0.0, // 車輪のx座標
-        .wheel_y = TREAD_RAD,  // 車輪のy座標
+        .wheel_y = TREAD_RAD_,  // 車輪のy座標
         .wheel_theta = M_PI // 車輪の角度
     }, 
     WheelConfig{
-        .wheel_radius = WHEEL_RAD, 
-        .wheel_x = - M_SQRT3 / 2 * TREAD_RAD,
-        .wheel_y = - 0.5 * TREAD_RAD, 
+        .wheel_radius = WHEEL_RAD_, 
+        .wheel_x = - M_SQRT3 / 2 * TREAD_RAD_,
+        .wheel_y = - 0.5 * TREAD_RAD_, 
         .wheel_theta = M_PI / 3
     }, 
     WheelConfig{
-        .wheel_radius = WHEEL_RAD, 
-        .wheel_x = + M_SQRT3 / 2 * TREAD_RAD, 
-        .wheel_y = - 0.5 * TREAD_RAD,
+        .wheel_radius = WHEEL_RAD_, 
+        .wheel_x = + M_SQRT3 / 2 * TREAD_RAD_, 
+        .wheel_y = - 0.5 * TREAD_RAD_,
         .wheel_theta = 5 * M_PI / 3
     }
 };

@@ -37,5 +37,9 @@ namespace BehaviorControllerParameter {
     constexpr PIDGain x_gain{70.0, 0.0, 0.0};
     constexpr PIDGain y_gain{70.0, 0.0, 0.0};
     constexpr PIDGain angle_gain{70.0, 0.0, 0.0};
+
+    constexpr float WHEEL_RAD = 45.0;           // 車輪の半径
+    constexpr float MESURE_WHEEL_RAD = 45.0;    // 測定輪の半径
+    constexpr float TREAD_RAD = 210.0;          // 中心から車輪までの距離
 }
 #endif // INCLUDED_VARIABLE_HPP_

@@ -1,22 +1,194 @@
-#include "Control/BehaviorController.hpp"
+// //====================================================
+// //     WheelOdem検証用
+// //====================================================
+
+// #include <mbed.h>
+// #include "Provider/WheelOdometry.hpp"
+// #include "Parts/Encoder.hpp" // 実際のエンコーダークラスのヘッダ
+// #include "config.hpp"
+
+// // 必要な構造体（未定義ならここで定義）
+// struct Velocity {
+//     float vx;
+//     float vy;
+// };
+
+// struct Acceleration {
+//     float ax;
+//     float ay;
+// };
+
+// // UART出力設定（必要に応じて）
+// // UnbufferedSerial pc(USBTX, USBRX, 115200); // TX, RX, ボーレート
+
+// void print(const char* format, ...) {
+//     char buf[128];
+//     va_list args;
+//     va_start(args, format);
+//     vsnprintf(buf, sizeof(buf), format, args);
+//     va_end(args);
+//     pc.write(buf, strlen(buf));
+// }
+
+// int main() {
+//     // 実機のエンコーダー設定
+//     // 例：PA_7 = A相, PA_6 = B相 のように
+//     Encoder x_encoder(InterruptInPins::MEASURING_ENCODER1_A, DigitalInPins::MEASURING_ENCODER1_B);
+//     Encoder y_encoder(InterruptInPins::MEASURING_ENCODER2_A, DigitalInPins::MEASURING_ENCODER2_B);
 
 
-int main(){
-    BehaviorController BC(BehaviorControllerParameter::x_gain, BehaviorControllerParameter::y_gain, BehaviorControllerParameter::angle_gain);
+//     float wheel_radius = 0.03f;   // 直径6cmのホイール
+//     int resolution = 1024;        // エンコーダの分解能（パルス数）
+
+//     WheelOdometry odom(&x_encoder, &y_encoder, wheel_radius, resolution);
+
+//     const float dt = 0.1f; // 秒（100ms）
+
+//     while (true) {
+//         Velocity vel = odom.calculateVelocity(dt);
+//         Acceleration acc = odom.calculateAcceleration(dt);
+
+//         print("Vel(vx=%.3f, vy=%.3f) [m/s], Acc(ax=%.3f, ay=%.3f) [m/s^2]\r\n",
+//               vel.vx, vel.vy, acc.ax, acc.ay);
+
+//         ThisThread::sleep_for(100ms);
+//     }
+// }
+
+// //-------------------------------------------
+// // 出力例
+// // WheelOdometry initialized
+// // Step  0: Vel(vx=3.68, vy=1.84), Acc(ax=36.84, ay=18.42)
+// // Step  1: Vel(vx=3.68, vy=1.84), Acc(ax=0.00, ay=0.00)
+// // Step  2: Vel(vx=3.68, vy=1.84), Acc(ax=0.00, ay=0.00)
+// //-------------------------------------------
+
+
+// //====================================================
+// //     ImuOdem検証用
+// //====================================================
+// #include <cstdio>
+// #include <chrono>
+// #include <thread>
+// #include "Provider/Database.hpp"
+// #include "Provider/ImuOdometry.hpp"
+// #include "config.hpp"
+
+// int main() {
+//     Imu imu(PinsForSensor::IMU_TX, PinsForSensor::IMU_RX);
+//     TimeOfFlightSensor frontTof(PinsForSensor::TOF1);
+//     TimeOfFlightSensor sideTof(PinsForSensor::TOF2);
+//     LimitSwitch frontSwitch(LimitSwitchPins::FRONT_LIMIT);
+//     LimitSwitch sideSwitch(LimitSwitchPins::SIDE_LIMIT);
+
+
+//     Database db(imu, frontTof, sideTof, frontSwitch, sideSwitch);
+//     ImuOdometry odom(db);
+
+//     const double dt = 0.1; // 100ms周期
+//     const int steps = 50;  // 5秒分更新
+
+//     for (int i = 0; i < steps; ++i) {
+//         odom.update(dt);
+
+//         auto [vx, vy] = odom.getVelocity();
+//         Pose2D pose = odom.getPose();
+
+//         printf("Step %2d: Pos(x=%.2f, y=%.2f, θ=%.2f deg), Vel(vx=%.2f, vy=%.2f)\n",
+//                i,
+//                pose.x, pose.y, pose.theta * 180.0 / M_PI,
+//                vx, vy);
+
+//         //std::this_thread::sleep_for(std::chrono::milliseconds(100));
+//         wait_us(100000);
+//     }
+
+//     return 0;
+// }
+
+
+
+// //====================================================
+// //     DataBase検証用
+// //====================================================
+
+
+// #include "Provider/Database.hpp"
+// #include "config.hpp"
+
+// int main() {
+//     Imu imu(PinsForSensor::IMU_TX, PinsForSensor::IMU_RX);
+//     TimeOfFlightSensor frontTof(PinsForSensor::TOF1);
+//     TimeOfFlightSensor sideTof(PinsForSensor::TOF2);
+//     LimitSwitch frontSwitch(LimitSwitchPins::FRONT_LIMIT);
+//     LimitSwitch sideSwitch(LimitSwitchPins::SIDE_LIMIT);
+
+//     Database db(imu, frontTof, sideTof, frontSwitch, sideSwitch);
+
+//     auto [ax, ay] = db.getAcceleration();
+//     printf("Accel X: %.2f, Y: %.2f\n", ax, ay);
+
+//     printf("Angular Vel: %.2f deg/s\n", db.getAngularVelocity());
+
+//     printf("Front TOF: %s\n", db.getFrontTofStatus() ? "Detected" : "Not Detected");
+//     printf("Side TOF: %s\n", db.getSideTofStatus() ? "Detected" : "Not Detected");
+
+//     printf("Front Switch: %s\n", db.getFrontLimitSwitchStatus() ? "Pressed" : "Not Pressed");
+//     printf("Side Switch: %s\n", db.getSideLimitSwitchStatus() ? "Pressed" : "Not Pressed");
+
+//     return 0;
+// }
+
+
+
+// //====================================================
+// //     WHEEL_ODEM検証用
+// //====================================================
+
+// #include "Control/BehaviorController.hpp"
+// #include "Provider/WheelOdometry.hpp"
+// #include "Parts/Encoder.hpp"
+// #include "config.hpp"
+
+// Encoder Y_MESURE_ENCODER(InterruptInPins::MEASURING_ENCODER1_A, DigitalInPins::MEASURING_ENCODER1_B);
+// Encoder X_MESURE_ENCODER(InterruptInPins::MEASURING_ENCODER2_A, DigitalInPins::MEASURING_ENCODER2_B);
+
+// float wheel_radius = 0.05f; // 5cm
+// int resolution = 2048;      // 1回転あたりのカウント数
+// WheelOdometry odom(&X_MESURE_ENCODER, &Y_MESURE_ENCODER, wheel_radius, resolution);
+
+// float dt = 0.01f; // 10ms周期
+
+// void loop() {
+//     Velocity vel = odom.calculateVelocity(dt);
+//     Acceleration acc = odom.calculateAcceleration(dt);
+
+//     printf("vel: vx=%.3f [m/s], vy=%.3f [m/s]\n", vel.vx, vel.vy);
+//     printf("acc: ax=%.3f [m/s^2], ay=%.3f [m/s^2]\n", acc.ax, acc.ay);
+// }
+
+
+// int main(){
+//     printf("Main Start");
+//     BehaviorController BC(BehaviorControllerParameter::x_gain, BehaviorControllerParameter::y_gain, BehaviorControllerParameter::angle_gain);
     
-    while(true){
-        BC.setTargetVelocity(0.0,20.0);
-        BC.setVelocity(0.0,0.0);
-        BC.setTargetAngularVelocity(0.0);
-        BC.setAngularVelocity(0.0);
-        BC.setMotor();
+//     while(true){
+//         printf("main roop");
+//         //loop();
+//         BC.setTargetVelocity(0.0,20.0);
+//         // printf("%f\n", odem.calculateVelocity(dt).vx);
+//         BC.setVelocity(odom.calculateVelocity(dt).vx,odom.calculateVelocity(dt).vy);
+//         BC.setVelocity(0.0, 0.0);
+//         BC.setTargetAngularVelocity(0.0);
+//         BC.setAngularVelocity(0.0);
+//         BC.setMotor();
 
-    }
-    return 0;
-}
+//     }
+//     return 0;
+// }
 
 
-
+//========================================================================================================================
 // #include "mbed.h"
 // #include "Control/BehaviorController.hpp"   
 // #include "Mechanism/Wheel.hpp"               

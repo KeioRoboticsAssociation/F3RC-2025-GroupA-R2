@@ -48,7 +48,8 @@ namespace InterruptInPins
 namespace DigitalInPins
 {
     constexpr PinName MEASURING_ENCODER1_B      = PA_7 ;     // エンコーダー1：測定輪エンコーダ1(前後)のB相
-    constexpr PinName MEASURING_ENCODER2_B      = PB_7 ;     // エンコーダー2：測定輪エンコーダ2(左右)のB相
+    //constexpr PinName MEASURING_ENCODER2_B      = PB_7 ;     // エンコーダー2：測定輪エンコーダ2(左右)のB相
+    constexpr PinName MEASURING_ENCODER2_B      = PB_10;     //仮置き
 
     constexpr PinName OMUNI_ENCODER1_B          = PA_8 ;     // エンコーダー3：オムニ用(前方)エンコーダー1のB相
     constexpr PinName OMUNI_ENCODER2_B          = PB_14;     // エンコーダー4：オムニ用(左後方)エンコーダー2のB相

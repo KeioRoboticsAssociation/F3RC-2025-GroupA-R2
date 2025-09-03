@@ -13,6 +13,8 @@ Encoder::Encoder(PinName interrupt_in_pin, PinName digital_in_pin, int resolutio
         interrupt_in.fall([this]()
                           { interrupt(0); });
     }
+
+    printf("Encoderインスタンス");
 }
 
 // 割り込みハンドラ

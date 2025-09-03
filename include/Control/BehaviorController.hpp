@@ -18,6 +18,11 @@ enum class TargetMode
 class BehaviorController
 {
 public:
+    
+    //=====================================================================================
+    //　 以下、使用するメソッド一覧　(速度がおすすめ)　※これらメソッドは原則ループ内で呼び出し
+    //=====================================================================================
+
     BehaviorController(PIDGain x_pid_gain, PIDGain y_pid_gain, PIDGain angle_pid_gain);
     // 座標(ロボット位置原点の座標系)の目標値を設定
     void setTargetPosition(double x, double y);
