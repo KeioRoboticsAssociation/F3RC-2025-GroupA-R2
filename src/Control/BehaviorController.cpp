@@ -172,3 +172,18 @@ void BehaviorController::stop(){
     RearLeftMotor.setDuty(0.0f);
     RearRightMotor.setDuty(0.0f);
 }
+
+
+void BehaviorController::updateFromStateEstimator(const StateEstimator& state) {
+    Pose2D pose = state.getRelativePosition();
+    auto vel = state.getVelocity();
+    auto acc = state.getAcceleration();
+    double ang = pose.theta;
+    double ang_vel = state.getAngularVelocity();
+
+    setPosition(pose.x, pose.y);
+    setVelocity(vel.first, vel.second);
+    setAcceleration(acc.first, acc.second);
+    setAngle(ang);
+    setAngularVelocity(ang_vel);
+}

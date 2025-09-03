@@ -8,6 +8,7 @@
 #include "config.hpp"
 #include "variable.hpp"
 #include "Parts/DCMotor.hpp"
+#include "Control/StateEstimator.hpp"
 
 enum class TargetMode
 {
@@ -44,12 +45,18 @@ public:
     void setAngularVelocity(double omega);
     // 現在の回転角加速度の設定
     void setAngularAcceleration(double alpha);
+
+    // 一気に現状を設定する
+    void updateFromStateEstimator(const StateEstimator& state);
+
     // PID制御で目標速度を算出する
     Twist calculateTargetVelocity();
     // 実際に動かす
     void setMotor();
     // 完全に停止する
     void stop();
+
+    
 
     double current_pos_x;
     double current_pos_y;

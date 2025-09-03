@@ -1,4 +1,50 @@
 // //====================================================
+// //  本環境用Main関数
+// //====================================================
+#include "Provider/Database.hpp"
+#include "Provider/WheelOdometry.hpp"
+#include "Provider/ImuOdometry.hpp"
+#include "Control/StateEstimator.hpp"
+#include "Mechanism/PIDController.hpp"
+#include "Control/BehaviorController.hpp"
+#include "Control/SectionManager.hpp"
+#include "Control/Section/Section1.hpp"
+
+int main() {
+    Database db;
+    WheelOdometry wheel_odom;
+    ImuOdometry imu_odom;
+    StateEstimator state(db, wheel_odom, imu_odom);
+
+    PIDGain x_pid, y_pid, ang_pid;
+    BehaviorController behavior(x_pid, y_pid, ang_pid);
+
+    // セクションを登録
+    SectionManager manager({
+        std::make_unique<Section1>(),
+        // std::make_unique<Section2>(),
+        // ...
+    });
+
+    while (!manager.allFinished()) {
+        double dt = getDt();
+
+        db.update();
+        state.update(dt);
+
+        // 各セクションに処理を委譲
+        manager.update(state, behavior, dt);
+
+        // モータ駆動
+        Twist target = behavior.calculateTargetVelocity();
+        behavior.setMotor();
+
+        wait(dt);
+    }
+}
+
+
+// //====================================================
 // //     WheelOdem検証用
 // //====================================================
 
