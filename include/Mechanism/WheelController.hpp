@@ -1,5 +1,5 @@
 #pragma once
-#include "Provider/Wheel.hpp"
+#include "Mechanism/Wheel.hpp"
 #include "Mechanism/MotorController.hpp"
 
 // N: 車輪の数

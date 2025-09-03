@@ -12,7 +12,7 @@ template <typename T>
 class PIDController
 {
 public:
-    PIDController() : gain({0.0f, 0.0f, 0.0f, 0}) {};          // デフォルトコンストラクタ
+    PIDController() : gain({0.0f, 0.0f, 0.0f, 1}) {};          // デフォルトコンストラクタ
     PIDController(PIDGain pid_gain) : gain(pid_gain) {};       // ゲインを与えて初期化
     PIDController(float kp, float ki, float kd, int frequency) // ゲインを与えて初期化
     {
@@ -25,14 +25,16 @@ public:
     // 偏差を与えると操作量を返す。
     T calculate(T error)
     {
-        // 周波数を考慮
-        T output = error * gain.kp +
-                   integral * (gain.ki / gain.frequency) +
-                   (error - prevError) * gain.kd * gain.frequency;
-        prevError = error; // 前回の偏差を更新
-        integral += error; // 積分値を更新
+        // frequency が 0 なら 1 に置き換える（安全策）
+        int freq = (gain.frequency > 0) ? gain.frequency : 1;
 
-        // 操作量を返す
+        T output = error * gain.kp +
+                integral * (gain.ki / freq) +
+                (error - prevError) * gain.kd * freq;
+
+        prevError = error;   // 前回の偏差を更新
+        integral += error;   // 積分値を更新
+
         return output;
     };
 

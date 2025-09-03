@@ -1,7 +1,10 @@
 #pragma once
+#include "Parts/DCMotor.hpp"
+#include "Parts/Encoder.hpp"
 #include "Mechanism/PIDController.hpp"
-#include "Provider/Wheel.hpp"
+#include "Mechanism/Wheel.hpp"
 #include "Mechanism/WheelController.hpp"
+#include "Mechanism/MotorController.hpp"
 #include "config.hpp"
 #include "variable.hpp"
 #include "Parts/DCMotor.hpp"
@@ -15,69 +18,69 @@ enum class TargetMode
 class BehaviorController
 {
 public:
-    // デフォルト WheelConfig
-    static std::array<WheelConfig, 3> defaultWheelConfigs() {
-        return {WheelConfig{0.0f},
-                WheelConfig{120.0f * M_PI / 180},
-                WheelConfig{240.0f * M_PI / 180}};
-    }
-
-    // デフォルトモーター配列
-    static std::array<MotorController*, 3> defaultMotors();
-
-    // フルコンストラクタ（デフォルト引数で簡単呼び出し可能）
-    BehaviorController(PIDGain x_pid_gain = BehaviorControllerParameter::x_gain,
-                       PIDGain y_pid_gain = BehaviorControllerParameter::y_gain,
-                       PIDGain angle_pid_gain = BehaviorControllerParameter::angle_gain,
-                       const std::array<WheelConfig, 3>& wheel_configs = defaultWheelConfigs(),
-                       const std::array<MotorController*, 3>& motors = defaultMotors(),
-                       float max_speed = 100.0f);
-
-    // 座標・速度・加速度設定
+    BehaviorController(PIDGain x_pid_gain, PIDGain y_pid_gain, PIDGain angle_pid_gain);
+    // 座標(ロボット位置原点の座標系)の目標値を設定
     void setTargetPosition(double x, double y);
+    // 並進速度(ロボット位置原点の座標系)の目標値を設定
     void setTargetVelocity(double vx, double vy);
+    // 回転角の目標値を設定
     void setTargetAngle(double theta);
+    // 回転角速度の目標値を設定
     void setTargetAngularVelocity(double omega);
+    // 現在の座標(ロボット位置原点の座標系)を設定
     void setPosition(double x, double y);
+    // 現在の並進速度(ロボット位置原点の座標系)を設定
     void setVelocity(double vx, double vy);
+    // 現在の並進加速度(ロボット位置原点の座標系)を設定
     void setAcceleration(double ax, double ay);
+    // 現在の回転角度の設定
     void setAngle(double theta);
+    // 現在の回転角速度の設定
     void setAngularVelocity(double omega);
+    // 現在の回転角加速度の設定
     void setAngularAcceleration(double alpha);
-
-    // 挙動実行
-    void move();
+    // PID制御で目標速度を算出する
+    Twist calculateTargetVelocity();
+    // 実際に動かす
+    void setMotor();
+    // 完全に停止する
     void stop();
 
+    double current_pos_x;
+    double current_pos_y;
+    double current_angle;
+    double current_velocity_x;
+    double current_velocity_y;
+    double current_velocity_angle;
+    double current_acceleration_x;
+    double current_acceleration_y;
+    double current_acceleration_angle;
+    double target_pos_x;
+    double target_pos_y;
+    double target_angle;
+    double target_velocity_x;
+    double target_velocity_y;
+    double target_velocity_angle;
+
 private:
-    WheelController<3> wheel_controller;
+    DCMotor FrontMotor;
+    Encoder FrontEncoder;
+    DCMotor RearLeftMotor;
+    Encoder RearLeftEncoder;
+    DCMotor RearRightMotor;
+    Encoder RearRightEncoder;
+
+    MotorController FrontMotorController;
+    MotorController RearLeftMotorController;
+    MotorController RearRightMotorController;
 
     PIDController<double> x_pid_controller;
     PIDController<double> y_pid_controller;
     PIDController<double> angle_pid_controller;
-
-    TargetMode xy_target_mode;
-    TargetMode angle_target_mode;
-
-    // 状態量
-    double current_pos_x = 0;
-    double current_pos_y = 0;
-    double current_angle = 0;
-    double current_velocity_x = 0;
-    double current_velocity_y = 0;
-    double current_velocity_angle = 0;
-    double current_acceleration_x = 0;
-    double current_acceleration_y = 0;
-    double current_acceleration_angle = 0;
-
-    // 目標値
-    double target_pos_x = 0;
-    double target_pos_y = 0;
-    double target_angle = 0;
-    double target_velocity_x = 0;
-    double target_velocity_y = 0;
-    double target_velocity_angle = 0;
-
-    // PID制御で目標速度を算出
-    Twist calculateTargetVelocity();
+    // calculateTargetVelocityで扱うx, yの目標が位置か速度のどちらなのか。
+    // true: 位置, false: 速度
+    TargetMode xy_target_mode = TargetMode::Velocity;
+    // calculateTargetVelocityで扱うangleの目標が位置か速度のどちらなのか。
+    // true: 位置, false: 速度
+    TargetMode angle_target_mode = TargetMode::Velocity;
 };

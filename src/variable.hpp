@@ -34,14 +34,8 @@ namespace CoalArmParameter {
 
 namespace BehaviorControllerParameter {
     // PIDゲイン設定
-    constexpr PIDGain x_gain{1.0, 0.0, 0.1};
-    constexpr PIDGain y_gain{1.0, 0.0, 0.1};
-    constexpr PIDGain angle_gain{1.0, 0.0, 0.1};
-
-    constexpr float WheelRadius_  = 20.0f;        // 車輪の半径 [mm]
-    constexpr float WheelX        = 30.0f;        // 車輪の中心のx座標 [mm]
-    constexpr float WheelY        = 30.0f;        // 車輪の中心のy座標 [mm]
-    constexpr float WheelTheta    = 30.0f;        // 車輪の方向 [rad]
-
+    constexpr PIDGain x_gain{70.0, 0.0, 0.0};
+    constexpr PIDGain y_gain{70.0, 0.0, 0.0};
+    constexpr PIDGain angle_gain{70.0, 0.0, 0.0};
 }
 #endif // INCLUDED_VARIABLE_HPP_
