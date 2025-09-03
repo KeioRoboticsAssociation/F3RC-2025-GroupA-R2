@@ -5,8 +5,6 @@
 #include "Mechanism/WheelController.hpp"
 #include <iostream>
 
-// int main() {
-//     printf("s\n");
 DCMotor FrontMotor(PwmOutPins::OMUNI_MOTOR1_PWM, DigitalOutPins::OMUNI_MOTOR1_DIR);
 Encoder FrontEncoder(InterruptInPins::OMUNI_ENCODER1_A, DigitalInPins::OMUNI_ENCODER1_B);
 DCMotor RearLeftMotor(PwmOutPins::OMUNI_MOTOR2_PWM, DigitalOutPins::OMUNI_MOTOR2_DIR);
@@ -34,13 +32,13 @@ std::array<WheelConfig, 3> config = {
         .wheel_radius = WHEEL_RAD, 
         .wheel_x = - M_SQRT3 / 2 * TREAD_RAD,
         .wheel_y = - 0.5 * TREAD_RAD, 
-        .wheel_theta = 5 * M_PI / 3
+        .wheel_theta = M_PI / 3
     }, 
     WheelConfig{
         .wheel_radius = WHEEL_RAD, 
         .wheel_x = + M_SQRT3 / 2 * TREAD_RAD, 
         .wheel_y = - 0.5 * TREAD_RAD,
-        .wheel_theta = M_PI / 3
+        .wheel_theta = 5 * M_PI / 3
     }
 };
 
@@ -51,11 +49,14 @@ WheelController<3> controller(config, {&mc, &mc2, &mc3});
 int main() {
     Twist tw;
     tw.vx = 0.0f;
-    tw.vy = 2.0f;
+    tw.vy = 100.0f;
     tw.omega = 0.0f;
     while(true){
         controller.setTargetTwist(tw);
         //std::cout << controller.twistToMotorSpeeds(tw) << std::endl;
+        printf("twistToMotorSpeeds[0]:%f\n", controller.twistToMotorSpeeds(tw)[0]);
+        printf("twistToMotorSpeeds[1]:%f\n", controller.twistToMotorSpeeds(tw)[1]);
+        printf("twistToMotorSpeeds[2]:%f\n", controller.twistToMotorSpeeds(tw)[2]);
     }
 
     return 0;
