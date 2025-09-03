@@ -2,6 +2,7 @@
 #include "Parts/DCMotor.hpp"
 #include "Parts/Encoder.hpp"
 #include "PIDController.hpp"
+#include "mbed.h"
 
 // PID制御を用いてDCモーターの出力を制御するクラス
 class MotorController
@@ -16,6 +17,16 @@ public:
     void stop();
     float getSpeed();
     float getTargetSpeed();
+    
+    void print();
+
+    // ループ呼び出しフラグ操作
+    bool isLoopCalled() const { return loop_called; }
+    void clearLoopFlag() { loop_called = false; }
+
+    float output_;
+    float encoder_;
+    float current_rps_;
 
 private:
     Ticker ticker;
@@ -26,6 +37,8 @@ private:
     float last_duty = 0;
     float max_duty;
     bool moving = false;
+
+    volatile bool loop_called = false; // ISR→main 通信用フラグ
 
     void loop();
 };

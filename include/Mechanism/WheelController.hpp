@@ -10,6 +10,7 @@ class WheelController
 public:
     WheelController(const std::array<WheelConfig, N> &wheel_configs, const std::array<MotorController *, N> &motors, float max_speed = 10000)
         : motors(motors), max_speed(max_speed)
+
     {
         for (int i = 0; i < N; i++)
         {

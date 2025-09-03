@@ -3,14 +3,26 @@
 MotorController::MotorController(DCMotor &motor, Encoder &encoder, PIDGain pid_gain, float max_duty)
     : motor(motor), encoder(encoder), pid_controller(pid_gain)
 {
-    ticker.attach(callback(this, &MotorController::loop), 1s / pid_controller.getFrequency());
+    using namespace std::chrono;
+
+    // 周期を μs に変換（frequency [Hz] → 周期 [us]）
+    auto period_us = microseconds(
+        static_cast<int>(1'000'000 / pid_controller.getFrequency())
+    );
+
+    // コンストラクタで attach → loop が常に動作
+    ticker.attach(callback(this, &MotorController::loop), period_us);
+
     this->max_duty = max_duty; // 最大デューティ比を設定
+    printf("succeed in constructor!!!!!!\n");
 }
 
 void MotorController::loop()
 {
-    if (!moving)
-    {
+    // ISR 内なので printf は禁止
+    loop_called = true; // main 側に通知
+
+    if (!moving) {
         return;
     }
 
@@ -23,16 +35,19 @@ void MotorController::loop()
     float output = pid_controller.calculate(target_rps - current_rps);
     float duty = last_duty + output / pid_controller.getFrequency();
 
+    // デバッグ用値
+    output_ = output;
+    encoder_ = current_position;
+    current_rps_ = current_rps;
+
     // デューティ比の制限
-    if (duty > max_duty)
-    {
+    if (duty > max_duty) {
         duty = max_duty;
         pid_controller.reset(); // 最大速度に達したら積分をリセット
     }
-    else if (duty < -max_duty)
-    {
+    else if (duty < -max_duty) {
         duty = -max_duty;
-        pid_controller.reset(); // 最大速度に達したら積分をリセット
+        pid_controller.reset(); // 最小速度に達したら積分をリセット
     }
 
     last_duty = duty;
@@ -63,4 +78,12 @@ float MotorController::getSpeed()
 float MotorController::getTargetSpeed()
 {
     return target_rps;
+}
+
+void MotorController::print()
+{
+    printf("started in class\n");
+    // printf("output: %f\n", output_ * 1000.0f);
+    // printf("encoder: %f\n", encoder_);
+    // printf("current_rps: %f\n", current_rps_);
 }
