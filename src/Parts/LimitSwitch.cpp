@@ -64,7 +64,7 @@ bool LimitSwitch::debounce(bool rawState) {
     // SS-10GL13に最適化された30msデバウンス時間
     // この時間はSS-10GL13のSimulated Roller Leverの
     // 機械的応答時間と接点バウンス特性を考慮
-    if (debounceTimer.read_ms() > DEBOUNCE_TIME_MS) {
+    if (std::chrono::duration_cast<std::chrono::milliseconds>(debounceTimer.elapsed_time()).count() > DEBOUNCE_TIME_MS) {
         // 十分な時間が経過 → 状態を確定
         if (rawState != currentState) {
             currentState = rawState;
