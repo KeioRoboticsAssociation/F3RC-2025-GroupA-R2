@@ -12,7 +12,10 @@ UnbufferedSerial pc(USBTX, USBRX);
 void _main() {
     pc.baud(9600);
 
-    imu.init();
+    if(!imu.init()) {
+        printf("IMU initialization failed\n");
+        return;
+    }
     printf("IMU initialization complete\n");
 
     while(true) {
