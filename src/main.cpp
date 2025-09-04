@@ -10,13 +10,10 @@ Imu imu(PinsForSensor::IMU_SDA, PinsForSensor::IMU_SCL);
 UnbufferedSerial pc(USBTX, USBRX);
 
 void _main() {
-    printf("IMU Test Program Start\n");
-    if(!imu.init()) {
-        printf("IMU Initialization Failed\n");
-        return;
-    }
-    printf("IMU Initialized Successfully\n");
     pc.baud(9600);
+
+    imu.init();
+    printf("IMU initialization complete\n");
 
     while(true) {
         double yaw = imu.getYaw();
