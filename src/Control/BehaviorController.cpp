@@ -8,7 +8,7 @@ BehaviorController::BehaviorController(PIDGain x_pid_gain, PIDGain y_pid_gain, P
       FrontEncoder(InterruptInPins::OMUNI_ENCODER1_A, DigitalInPins::OMUNI_ENCODER1_B),
       RearLeftMotor(PwmOutPins::OMUNI_MOTOR2_PWM, DigitalOutPins::OMUNI_MOTOR2_DIR),
       RearLeftEncoder(InterruptInPins::OMUNI_ENCODER2_A, DigitalInPins::OMUNI_ENCODER2_B),
-      RearRightMotor(PwmOutPins::OMUNI_MOTOR3_PWM, DigitalOutPins::OMUNI_MOTOR3_DIR),
+      RearRightMotor(PwmOutPins::OMUNI_MOTOR3_PWM, DigitalOutPins::OMUNI_MOTOR3_DIR, true), // 右後ろモーターの方向を反転
       RearRightEncoder(InterruptInPins::OMUNI_ENCODER3_A, DigitalInPins::OMUNI_ENCODER3_B),
       FrontMotorController(FrontMotor, FrontEncoder),
       RearLeftMotorController(RearLeftMotor, RearLeftEncoder),
@@ -149,7 +149,7 @@ std::array<WheelConfig, 3> config = {
         .wheel_radius = WHEEL_RAD_, 
         .wheel_x = + M_SQRT3 / 2 * TREAD_RAD_, 
         .wheel_y = - 0.5 * TREAD_RAD_,
-        .wheel_theta = 5 * M_PI / 3
+        .wheel_theta = -M_PI / 3  // 右後ろモーターの角度を-60度に修正
     }
 };
 
@@ -161,9 +161,9 @@ void BehaviorController::setMotor(){
     controller.setTargetTwist(calculateTargetVelocity());
     //std::cout << controller.twistToMotorSpeeds(tw) << std::endl;
    
-    printf("twistToMotorSpeeds[0]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[0]);
-    printf("twistToMotorSpeeds[1]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[1]);
-    printf("twistToMotorSpeeds[2]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[2]);
+    auto motor_speeds = controller.twistToMotorSpeeds(calculateTargetVelocity());
+    printf("Motor Speeds - Front[0]:%f, RearLeft[1]:%f, RearRight[2]:%f\n", 
+           motor_speeds[0], motor_speeds[1], motor_speeds[2]);
 
 }
 
