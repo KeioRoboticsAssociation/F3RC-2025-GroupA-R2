@@ -121,10 +121,10 @@ Twist BehaviorController::calculateTargetVelocity()
     // ==========================================================
 
 
-    printf("error_x:%f error_y:%f error_angle:%f\n",
-       target_pos_x - current_pos_x,
-       target_pos_y - current_pos_y,
-       target_angle - current_angle);
+    // printf("error_x:%f error_y:%f error_angle:%f\n",
+    //    target_pos_x - current_pos_x,
+    //    target_pos_y - current_pos_y,
+    //    target_angle - current_angle);
 
     return Twist{(float)x_output, (float)y_output, (float)angle_output};
 }
@@ -165,12 +165,28 @@ void BehaviorController::setMotor(){
     printf("twistToMotorSpeeds[1]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[1]);
     printf("twistToMotorSpeeds[2]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[2]);
 
+    // printf("FrontEncoder:%f\n", FrontEncoder.getCount());
+    // printf("RearLeftEncoder:%f\n", RearLeftEncoder.getCount());
+    // printf("RearRightEncoder:%f\n", RearRightEncoder.getCount());
+
+
 }
 
 void BehaviorController::stop(){
     FrontMotor.setDuty(0.0f);
     RearLeftMotor.setDuty(0.0f);
     RearRightMotor.setDuty(0.0f);
+}
+
+void BehaviorController::test(){
+    FrontMotor.setDuty(0.5f);
+    RearLeftMotor.setDuty(0.5f);
+    RearRightMotor.setDuty(0.5f);
+    wait_us(1000000);
+    // printf("FrontEncoder:%d\n", FrontEncoder.getCount());
+    // printf("RearLeftEncoder:%d\n", RearLeftEncoder.getCount());
+    // printf("RearRightEncoder:%d\n", RearRightEncoder.getCount());
+
 }
 
 

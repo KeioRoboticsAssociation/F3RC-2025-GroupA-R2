@@ -6,12 +6,25 @@ Encoder::Encoder(PinName interrupt_in_pin, PinName digital_in_pin, int resolutio
     converted_resolution = resolution * (is_dual ? 2 : 1) * (reverse_dir ? -1 : 1);
 
     // 割り込みハンドラの設定
-    interrupt_in.rise([this]()
-                      { interrupt(1); });
-    if (is_dual)
+    if (reverse_dir)
     {
-        interrupt_in.fall([this]()
-                          { interrupt(0); });
+        interrupt_in.rise([this]()
+                          { interrupt_reverse(1); });
+        if (is_dual)
+        {
+            interrupt_in.fall([this]()
+                              { interrupt_reverse(0); });
+        }
+    }
+    else
+    {
+        interrupt_in.rise([this]()
+                          { interrupt(1); });
+        if (is_dual)
+        {
+            interrupt_in.fall([this]()
+                              { interrupt(0); });
+        }
     }
 
     printf("Encoderインスタンス");
@@ -27,6 +40,19 @@ void Encoder::interrupt(int sgn)
     else
     {
         count--;
+    }
+}
+
+// 割り込みハンドラ
+void Encoder::interrupt_reverse(int sgn)
+{
+    if (digital_in.read() == sgn)
+    {
+        count--;
+    }
+    else
+    {
+        count++;
     }
 }
 

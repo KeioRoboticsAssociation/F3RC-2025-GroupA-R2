@@ -7,8 +7,7 @@
 #include "Provider/Database.hpp" // Databaseのメソッドを直接呼び出すため、完全な定義をインクルード
 #include "Provider/ImuOdometry.hpp"
 #include "Provider/WheelOdometry.hpp"
-
-struct Pose2D { double x; double y; double theta; };
+#include "Common/Style.hpp"
 
 struct TOFStatus {
     bool front;

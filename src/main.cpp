@@ -1,47 +1,47 @@
-// //====================================================
-// //  本環境用Main関数
-// //====================================================
-#include "Provider/Database.hpp"
-#include "Provider/WheelOdometry.hpp"
-#include "Provider/ImuOdometry.hpp"
-#include "Control/StateEstimator.hpp"
-#include "Mechanism/PIDController.hpp"
-#include "Control/BehaviorController.hpp"
-#include "Control/SectionManager.hpp"
-#include "Control/Section/Section1.hpp"
+// // //====================================================
+// // //  本環境用Main関数
+// // //====================================================
+// #include "Provider/Database.hpp"
+// #include "Provider/WheelOdometry.hpp"
+// #include "Provider/ImuOdometry.hpp"
+// #include "Control/StateEstimator.hpp"
+// #include "Mechanism/PIDController.hpp"
+// #include "Control/BehaviorController.hpp"
+// #include "Control/SectionManager.hpp"
+// #include "Control/Section/Section1.hpp"
 
-int main() {
-    Database db;
-    WheelOdometry wheel_odom;
-    ImuOdometry imu_odom;
-    StateEstimator state(db, wheel_odom, imu_odom);
+// int main() {
+//     Database db;
+//     WheelOdometry wheel_odom;
+//     ImuOdometry imu_odom;
+//     StateEstimator state(db, wheel_odom, imu_odom);
 
-    PIDGain x_pid, y_pid, ang_pid;
-    BehaviorController behavior(x_pid, y_pid, ang_pid);
+//     PIDGain x_pid, y_pid, ang_pid;
+//     BehaviorController behavior(x_pid, y_pid, ang_pid);
 
-    // セクションを登録
-    SectionManager manager({
-        std::make_unique<Section1>(),
-        // std::make_unique<Section2>(),
-        // ...
-    });
+//     // セクションを登録
+//     SectionManager manager({
+//         std::make_unique<Section1>(),
+//         // std::make_unique<Section2>(),
+//         // ...
+//     });
 
-    while (!manager.allFinished()) {
-        double dt = getDt();
+//     while (!manager.allFinished()) {
+//         double dt = getDt();
 
-        db.update();
-        state.update(dt);
+//         db.update();
+//         state.update(dt);
 
-        // 各セクションに処理を委譲
-        manager.update(state, behavior, dt);
+//         // 各セクションに処理を委譲
+//         manager.update(state, behavior, dt);
 
-        // モータ駆動
-        Twist target = behavior.calculateTargetVelocity();
-        behavior.setMotor();
+//         // モータ駆動
+//         Twist target = behavior.calculateTargetVelocity();
+//         behavior.setMotor();
 
-        wait(dt);
-    }
-}
+//         wait(dt);
+//     }
+// }
 
 
 // //====================================================
@@ -187,51 +187,55 @@ int main() {
 
 
 
-// //====================================================
-// //     WHEEL_ODEM検証用
-// //====================================================
+//====================================================
+//     WHEEL_ODEM検証用
+//====================================================
 
-// #include "Control/BehaviorController.hpp"
-// #include "Provider/WheelOdometry.hpp"
-// #include "Parts/Encoder.hpp"
-// #include "config.hpp"
+#include "Control/BehaviorController.hpp"
+#include "Provider/WheelOdometry.hpp"
+#include "Parts/Encoder.hpp"
+#include "config.hpp"
 
-// Encoder Y_MESURE_ENCODER(InterruptInPins::MEASURING_ENCODER1_A, DigitalInPins::MEASURING_ENCODER1_B);
-// Encoder X_MESURE_ENCODER(InterruptInPins::MEASURING_ENCODER2_A, DigitalInPins::MEASURING_ENCODER2_B);
+Encoder Y_MESURE_ENCODER(InterruptInPins::MEASURING_ENCODER1_A, DigitalInPins::MEASURING_ENCODER1_B, 2048, true);
+Encoder X_MESURE_ENCODER(InterruptInPins::MEASURING_ENCODER2_A, DigitalInPins::MEASURING_ENCODER2_B);
 
-// float wheel_radius = 0.05f; // 5cm
-// int resolution = 2048;      // 1回転あたりのカウント数
-// WheelOdometry odom(&X_MESURE_ENCODER, &Y_MESURE_ENCODER, wheel_radius, resolution);
+float wheel_radius = 0.03f; // 3cm
+int resolution = 2048;      // 1回転あたりのカウント数
+WheelOdometry odom(&X_MESURE_ENCODER, &Y_MESURE_ENCODER, wheel_radius, resolution);
 
-// float dt = 0.01f; // 10ms周期
+float dt = 0.01f; // 10ms周期
 
-// void loop() {
-//     Velocity vel = odom.calculateVelocity(dt);
-//     Acceleration acc = odom.calculateAcceleration(dt);
+void loop() {
+    Velocity vel = odom.calculateVelocity(dt);
+    Acceleration acc = odom.calculateAcceleration(dt);
 
-//     printf("vel: vx=%.3f [m/s], vy=%.3f [m/s]\n", vel.vx, vel.vy);
-//     printf("acc: ax=%.3f [m/s^2], ay=%.3f [m/s^2]\n", acc.ax, acc.ay);
-// }
+    // printf("vel: vx=%.3f [m/s], vy=%.3f [m/s]\n", vel.vx, vel.vy);
+    // printf("acc: ax=%.3f [m/s^2], ay=%.3f [m/s^2]\n", acc.ax, acc.ay);
+}
+
+#include "Parts/DCMotor.hpp"
 
 
-// int main(){
-//     printf("Main Start");
-//     BehaviorController BC(BehaviorControllerParameter::x_gain, BehaviorControllerParameter::y_gain, BehaviorControllerParameter::angle_gain);
+int main(){
+    // printf("Main Start");
+    BehaviorController BC(BehaviorControllerParameter::x_gain, BehaviorControllerParameter::y_gain, BehaviorControllerParameter::angle_gain);
     
-//     while(true){
-//         printf("main roop");
-//         //loop();
-//         BC.setTargetVelocity(0.0,20.0);
-//         // printf("%f\n", odem.calculateVelocity(dt).vx);
-//         BC.setVelocity(odom.calculateVelocity(dt).vx,odom.calculateVelocity(dt).vy);
-//         BC.setVelocity(0.0, 0.0);
-//         BC.setTargetAngularVelocity(0.0);
-//         BC.setAngularVelocity(0.0);
-//         BC.setMotor();
+    while(true){
+        // printf("main roop\n");
+        loop();
+        BC.setTargetVelocity(0.0,20.0);
+        // printf("%f\n", odem.calculateVelocity(dt).vx);
+        BC.setVelocity(odom.calculateVelocity(dt).vx,odom.calculateVelocity(dt).vy);
+        // BC.setVelocity(0.0, 0.0);
+        BC.setTargetAngularVelocity(0.0);
+        // BC.setAngularVelocity(0.0);
+        BC.setMotor();
+        //BC.test();
 
-//     }
-//     return 0;
-// }
+    }
+
+    return 0;
+}
 
 
 //========================================================================================================================

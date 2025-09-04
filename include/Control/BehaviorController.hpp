@@ -56,6 +56,8 @@ public:
     // 完全に停止する
     void stop();
 
+    void test();
+
     
 
     double current_pos_x;
