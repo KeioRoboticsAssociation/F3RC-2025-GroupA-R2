@@ -36,7 +36,7 @@ namespace InterruptInPins
 
     constexpr PinName OMUNI_ENCODER1_A          = PA_9 ;     // エンコーダー3：オムニ(前方)用エンコーダー1のA相
     constexpr PinName OMUNI_ENCODER2_A          = PB_13;     // エンコーダー4：オムニ(左後方)用エンコーダー2のA相
-    constexpr PinName OMUNI_ENCODER3_A          = PC_12;     // エンコーダー5：オムニ(右後方)用エンコーダー3のA相
+    constexpr PinName OMUNI_ENCODER3_A          = PC_10;     // エンコーダー5：オムニ(右後方)用エンコーダー3のA相
 
     constexpr PinName PSEUDO_SERVO_ENCODER1_A   = PC_2 ;     // エンコーダー6：疑似サーボ(石炭上下)用エンコーダー1のA相
     constexpr PinName PSEUDO_SERVO_ENCODER2_A   = PB_5 ;     // エンコーダー7：疑似サーボ(石油上下)用エンコーダー2のA相
@@ -75,16 +75,9 @@ namespace LimitSwitchPins
 
 namespace PinsForSensor
 {
-    constexpr PinName IMU_RX    = PC_11 ;
-    constexpr PinName IMU_TX    = PC_10 ;
-    
-    // constexpr PinName IMU_SDA   = PC_12 ;
-    // constexpr PinName IMU_SCL   = PB_10 ;
+    constexpr PinName IMU_SDA   = PC_12 ;
+    constexpr PinName IMU_SCL   = PB_10 ;
 
     constexpr PinName TOF1      = PC_1 ;       // 前方TOFセンサー
     constexpr PinName TOF2      = PC_0 ;       // 側方TOFセンサー
 }
-
-
-
-

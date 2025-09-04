@@ -6,7 +6,7 @@ int main() { std::cin.tie(nullptr); std::ios::sync_with_stdio(false); _main(); }
 #include "config.hpp"
 #include "Parts/Imu.hpp"
 
-Imu imu(PinsForSensor::IMU_TX, PinsForSensor::IMU_RX);
+Imu imu(PinsForSensor::IMU_SDA, PinsForSensor::IMU_SCL);
 UnbufferedSerial pc(USBTX, USBRX);
 
 void _main() {
