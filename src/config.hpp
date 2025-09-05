@@ -31,23 +31,23 @@ namespace PwmOutPins
 
 namespace InterruptInPins
 {
-    constexpr PinName MEASURING_ENCODER1_A      = PC_6 ;     // エンコーダー1：測定輪エンコーダ1(前後)のA相
+    constexpr PinName MEASURING_ENCODER1_A      = PA_7 ;     // エンコーダー1：測定輪エンコーダ1(前後)のA相
     constexpr PinName MEASURING_ENCODER2_A      = PB_6 ;     // エンコーダー2：測定輪エンコーダ2(左右)のA相
 
     constexpr PinName OMUNI_ENCODER1_A          = PA_9 ;     // エンコーダー3：オムニ(前方)用エンコーダー1のA相
     constexpr PinName OMUNI_ENCODER2_A          = PB_13;     // エンコーダー4：オムニ(左後方)用エンコーダー2のA相
-    constexpr PinName OMUNI_ENCODER3_A          = PC_12;     // エンコーダー5：オムニ(右後方)用エンコーダー3のA相
+    constexpr PinName OMUNI_ENCODER3_A          = PC_10;     // エンコーダー5：オムニ(右後方)用エンコーダー3のA相
 
     constexpr PinName PSEUDO_SERVO_ENCODER1_A   = PC_2 ;     // エンコーダー6：疑似サーボ(石炭上下)用エンコーダー1のA相
     constexpr PinName PSEUDO_SERVO_ENCODER2_A   = PB_5 ;     // エンコーダー7：疑似サーボ(石油上下)用エンコーダー2のA相
-    constexpr PinName PSEUDO_SERVO_ENCODER3_A   = PC_5 ;     // エンコーダー8：疑似サーボ(石油掴む)用エンコーダー3のA相
+    constexpr PinName PSEUDO_SERVO_ENCODER3_A   = PA_12 ;     // エンコーダー8：疑似サーボ(石油掴む)用エンコーダー3のA相
 }
 
 
 
 namespace DigitalInPins
 {
-    constexpr PinName MEASURING_ENCODER1_B      = PA_7 ;     // エンコーダー1：測定輪エンコーダ1(前後)のB相
+    constexpr PinName MEASURING_ENCODER1_B      = PC_6 ;     // エンコーダー1：測定輪エンコーダ1(前後)のB相
     constexpr PinName MEASURING_ENCODER2_B      = PB_7 ;     // エンコーダー2：測定輪エンコーダ2(左右)のB相
 
     constexpr PinName OMUNI_ENCODER1_B          = PA_8 ;     // エンコーダー3：オムニ用(前方)エンコーダー1のB相
@@ -56,7 +56,7 @@ namespace DigitalInPins
 
     constexpr PinName PSEUDO_SERVO_ENCODER1_B   = PC_3 ;     // エンコーダー6：疑似サーボ(石炭上下)用エンコーダー1のB相
     constexpr PinName PSEUDO_SERVO_ENCODER2_B   = PB_4;     // エンコーダー7：疑似サーボ(石油上下)用エンコーダー2のB相
-    constexpr PinName PSEUDO_SERVO_ENCODER3_B   = PA_12;     // エンコーダー8：疑似サーボ(石油掴む)用エンコーダー3のB相
+    constexpr PinName PSEUDO_SERVO_ENCODER3_B   = PC_5;     // エンコーダー8：疑似サーボ(石油掴む)用エンコーダー3のB相
 }
 
 
@@ -75,16 +75,9 @@ namespace LimitSwitchPins
 
 namespace PinsForSensor
 {
-    constexpr PinName IMU_RX    = PC_11 ;
-    constexpr PinName IMU_TX    = PC_10 ;
-    
-    // constexpr PinName IMU_SDA   = PC_12 ;
-    // constexpr PinName IMU_SCL   = PB_10 ;
+    constexpr PinName IMU_SDA   = PC_12 ;      // 加速度センサー: SDAピン
+    constexpr PinName IMU_SCL   = PB_10 ;      // 加速度センサー: SCLピン
 
     constexpr PinName TOF1      = PC_1 ;       // 前方TOFセンサー
     constexpr PinName TOF2      = PC_0 ;       // 側方TOFセンサー
 }
-
-
-
-
