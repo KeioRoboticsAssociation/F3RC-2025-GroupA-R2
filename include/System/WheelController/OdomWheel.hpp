@@ -12,8 +12,8 @@ template <int N>
 class OdomWheel
 {
 public:
-    OdomWheel(const std::array<WheelConfig, N> &wheel_configs, const std::array<MotorController *, N> &motors, const std::array<Encoder *, N> &encoders, chrono::microseconds update_interval = chrono::microseconds(5000))
-        : wheel_controller(wheel_configs, motors), odometry(wheel_configs, encoders, update_interval)
+    OdomWheel(PIDGain pid_gain, const std::array<WheelConfig, N> &wheel_configs, const std::array<MotorController *, N> &motors, const std::array<Encoder *, N> &encoders, chrono::microseconds update_interval = chrono::microseconds(5000))
+        : pid_controller(pid_gain), wheel_controller(wheel_configs, motors), odometry(wheel_configs, encoders, update_interval)
     {
         wheel_controller.setTargetTwist({0.0, 0.0, 0.0});
         odometry.setPose({0.0, 0.0, 0.0});
@@ -23,11 +23,16 @@ public:
     {
         Pose current_pose = odometry.getCurrentPose();
         Pose target_pose = getTargetPose();
+        printf("current_pose: %f, %f, %f\n", current_pose.x, current_pose.y, current_pose.theta);
+        printf("target_pose: %f, %f, %f\n", target_pose.x, target_pose.y, target_pose.theta);
 
         Pose error = target_pose - current_pose;
+        printf("error: %f, %f, %f\n", error.x, error.y, error.theta);
         // 返ってくるのはTwistなので型変換
         Pose result = pid_controller.calculate(error);
         Twist target_twist{result.x, result.y, result.theta};
+
+        printf("body_target_twist: %f, %f, %f\n", result.x, result.y, result.theta);
 
         wheel_controller.setTargetTwist(target_twist);
     }

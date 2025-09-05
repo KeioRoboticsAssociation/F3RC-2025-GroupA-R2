@@ -25,6 +25,7 @@ public:
     // 偏差を与えると操作量を返す。
     T calculate(T error)
     {
+        printf("frequency: %d\n", gain.frequency);
         // 周波数を考慮
         T output = error * gain.kp +
                    integral * (gain.ki / gain.frequency) +

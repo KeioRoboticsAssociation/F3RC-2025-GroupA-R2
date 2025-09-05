@@ -16,6 +16,7 @@ public:
     void stop();
     float getSpeed();
     float getTargetSpeed();
+    void loop();
 
 private:
     Ticker ticker;
@@ -27,5 +28,4 @@ private:
     float max_duty;
     bool moving = false;
 
-    void loop();
 };

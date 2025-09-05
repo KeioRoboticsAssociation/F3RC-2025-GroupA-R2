@@ -3,7 +3,6 @@
 MotorController::MotorController(DCMotor &motor, Encoder &encoder, PIDGain pid_gain, float max_duty)
     : motor(motor), encoder(encoder), pid_controller(pid_gain)
 {
-    ticker.attach(callback(this, &MotorController::loop), 1s / pid_controller.getFrequency());
     this->max_duty = max_duty; // 最大デューティ比を設定
 }
 
@@ -21,7 +20,9 @@ void MotorController::loop()
 
     // PID制御
     float output = pid_controller.calculate(target_rps - current_rps);
+    printf("output: %f\n", output);
     float duty = last_duty + output / pid_controller.getFrequency();
+    printf("duty1: %f\n", duty);
 
     // デューティ比の制限
     if (duty > max_duty)
@@ -36,6 +37,7 @@ void MotorController::loop()
     }
 
     last_duty = duty;
+    printf("duty2: %f\n", duty);
 
     // モーターへの出力
     motor.setDuty(duty);
