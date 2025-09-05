@@ -88,10 +88,25 @@ bool Imu::init()
 
     // ワーカースレッドを開始
     data_update_thread_.start(callback(this, &Imu::update_thread_worker));
+
+    // 角速度計算用タイマー
+    dt_timer_.start();
+
     // TickerはISRとして`ticker_isr`を呼び出すように設定
     data_update_ticker_.attach(callback(this, &Imu::ticker_isr), chrono::microseconds(UPDATE_INTERVAL_US));
 
     printf("BNO055 initialization completed\n");
+
+    // 少し待機してから、リセット
+    ThisThread::sleep_for(50ms);
+    resetYaw();
+
+    // 最初のヨー角を記録
+    data_mutex_.lock();
+    last_yaw_ = yaw_;
+    dt_timer_.reset();
+    data_mutex_.unlock();
+
     return true;
 }
 
@@ -132,14 +147,6 @@ Vector3 Imu::getAngularVelocity()
     Vector3 angular_velocity = angular_velocity_;
     data_mutex_.unlock();
     return angular_velocity;
-}
-
-Vector3 Imu::getLinearAcceleration()
-{
-    data_mutex_.lock();
-    Vector3 linear_acceleration = linear_acceleration_;
-    data_mutex_.unlock();
-    return linear_acceleration;
 }
 
 bool Imu::isCalibrated()
@@ -208,51 +215,43 @@ void Imu::update_thread_worker()
 {
     while (true)
     {
-        // ISRからの信号を待つ
         event_flags_.wait_any(UPDATE_SIGNAL);
 
-        // --- ここからは通常のスレッドコンテキスト ---
-        // I2C通信やMutex操作を安全に実行できる
-        uint8_t buffer[18];
+        uint8_t buffer[6];
+        double current_yaw = 0.0, current_roll = 0.0, current_pitch = 0.0;
+        uint8_t current_calib_status = 0;
 
-        data_mutex_.lock();
-
-        // オイラー角データを読み取り
         if (readBytes(BNO055_EULER_H_LSB_ADDR, buffer, 6))
         {
-            int16_t yaw_raw = combineBytes(buffer[0], buffer[1]);
-            int16_t roll_raw = combineBytes(buffer[2], buffer[3]);
-            int16_t pitch_raw = combineBytes(buffer[4], buffer[5]);
-            yaw_ = yaw_raw / 16.0;
-            roll_ = roll_raw / 16.0;
-            pitch_ = pitch_raw / 16.0;
+            current_yaw = combineBytes(buffer[0], buffer[1]) / 16.0;
+            current_roll = combineBytes(buffer[2], buffer[3]) / 16.0;
+            current_pitch = combineBytes(buffer[4], buffer[5]) / 16.0;
         }
 
-        // 角速度データを読み取り
-        if (readBytes(BNO055_GYRO_DATA_X_LSB_ADDR, buffer, 6))
+        current_calib_status = readByte(BNO055_CALIB_STAT_ADDR);
+
+        double yaw_velocity = 0.0;
+        float dt = dt_timer_.read();
+        
+        if (dt > 1e-6) // ゼロ除算防止
         {
-            int16_t x_raw = combineBytes(buffer[0], buffer[1]);
-            int16_t y_raw = combineBytes(buffer[2], buffer[3]);
-            int16_t z_raw = combineBytes(buffer[4], buffer[5]);
-            angular_velocity_.x = x_raw / 16.0;
-            angular_velocity_.y = y_raw / 16.0;
-            angular_velocity_.z = z_raw / 16.0;
+            double delta_yaw = current_yaw - last_yaw_;
+            if (delta_yaw > 180.0) {
+                delta_yaw -= 360.0;
+            } else if (delta_yaw < -180.0) {
+                delta_yaw += 360.0;
+            }
+            yaw_velocity = delta_yaw / dt;
         }
+        dt_timer_.reset();
 
-        // 線形加速度データを読み取り
-        if (readBytes(BNO055_LINEAR_ACCEL_DATA_X_LSB_ADDR, buffer, 6))
-        {
-            int16_t x_raw = combineBytes(buffer[0], buffer[1]);
-            int16_t y_raw = combineBytes(buffer[2], buffer[3]);
-            int16_t z_raw = combineBytes(buffer[4], buffer[5]);
-            linear_acceleration_.x = x_raw / 100.0;
-            linear_acceleration_.y = y_raw / 100.0;
-            linear_acceleration_.z = z_raw / 100.0;
-        }
-
-        // キャリブレーション状態を読み取り
-        calibration_status_ = readByte(BNO055_CALIB_STAT_ADDR);
-
+        data_mutex_.lock();
+        yaw_ = current_yaw;
+        roll_ = current_roll;
+        pitch_ = current_pitch;
+        last_yaw_ = current_yaw;
+        calibration_status_ = current_calib_status;
+        angular_velocity_ = {0.0, 0.0, yaw_velocity};
         data_mutex_.unlock();
     }
 }

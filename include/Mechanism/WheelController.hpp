@@ -63,9 +63,10 @@ public:
         {
             speeds[i] *= dec_ratio;
         }
-        
-        printf("SPEED_0: %f \n SPEED_1: %f \n SPEED_2: %f\n",speeds[0], speeds[1], speeds[2]);
-        
+
+        extern int log_cnt;
+        if (log_cnt == 0) printf("SPEED_0: %f\nSPEED_1: %f\nSPEED_2: %f\n",speeds[0], speeds[1], speeds[2]);
+
         return speeds;
     }
 

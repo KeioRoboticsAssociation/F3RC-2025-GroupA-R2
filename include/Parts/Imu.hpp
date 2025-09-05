@@ -18,7 +18,6 @@ public:
     double getPitch();
     double getRoll();
     Vector3 getAngularVelocity();
-    Vector3 getLinearAcceleration();
     bool isCalibrated();
     void resetYaw();
 
@@ -30,6 +29,10 @@ private:
     Vector3 linear_acceleration_;
     uint8_t calibration_status_;
     double yaw_offset_;
+
+    // ヨー角速度計算用
+    Timer dt_timer_;
+    double last_yaw_;
 
     // 同期制御用
     Mutex data_mutex_;

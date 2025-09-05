@@ -38,6 +38,8 @@ PIDGain angle_gain{0.1f, 0.0f, 0.1f, 1};
 
 BehaviorController controller(x_gain, y_gain, angle_gain);
 
+int log_cnt = 0;
+
 int main() {
     printf("=== Robot Start ===\n");
 
@@ -47,9 +49,9 @@ int main() {
     // 自己位置の登録
     state_estimator.resetCoordinateSystem();
 
-    // 目標位置 (0.0, 2.0) と目標角度 0 rad
-    controller.setTargetVelocity(3.0, 0.0);
-    controller.setTargetAngularVelocity(0.0);
+    // 目標位置 (2.0, 0.0) と目標角度 π/2 rad
+    controller.setTargetPosition(0.0, 0.0);
+    controller.setTargetAngle(M_PI / 2.);
 
     // ------------------------
     // Pゲイン変化用 Timer
@@ -62,26 +64,28 @@ int main() {
     const float duration = 30.0f; // 10秒かけて P を増加
 
     while (true) {
-        printf("X Position:%f\n",state_estimator.getVelocity().first);
-        printf("Y Position:%f\n",state_estimator.getVelocity().second);
-        printf("theta Position:%f\n",state_estimator.getAngularVelocity());
-        
+        log_cnt = ++log_cnt % 100;
+        if (log_cnt == 0) {
+            printf("\n-----\n");
+        }
 
         // 状態推定
         state_estimator.update(dt);
 
         // 推定結果を BehaviorController に渡す
-        // Pose2D pose = state_estimator.getVelocity();
+        Pose2D pose = state_estimator.getRelativePosition();
         auto vel = state_estimator.getVelocity();
         auto acc = state_estimator.getAcceleration();
-        // double ang = pose.theta;
         double ang_vel = state_estimator.getAngularVelocity();
 
-        // controller.setPosition(pose.x, pose.y);
-        controller.setVelocity(vel.first, vel.second);
-        controller.setAcceleration(acc.first, acc.second);
-        // controller.setAngle(ang);
-        controller.setAngularVelocity(ang_vel);
+        if (log_cnt == 0) {
+            printf("Estimated Pose: x=%f, y=%f, theta=%f\n", pose.x, pose.y, pose.theta);
+            printf("Estimated Velocity: vx=%f, vy=%f\n", vel.first, vel.second);
+            printf("Estimated Acceleration: ax=%f, ay=%f\n", acc.first, acc.second);
+            printf("Estimated Angular Velocity: omega=%f\n", ang_vel);
+        }
+
+        controller.updateFromStateEstimator(state_estimator);
 
         // ------------------------
         // Pゲインをなめらかに変更
@@ -98,7 +102,7 @@ int main() {
         controller.setMotor();
 
         // // デバッグ出力
-        // printf("time=%f, P=%f, pose=(%f,%f,%f)\n", t, P_gain, pose.x, pose.y, pose.theta);
+        if (log_cnt == 0) printf("time=%f, P=%f, pose=(%f,%f,%f)\n", t, P_gain, pose.x, pose.y, pose.theta);
 
         // printf("IMU:%f",imu.getYaw());
 

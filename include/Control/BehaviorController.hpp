@@ -35,18 +35,6 @@ public:
     void setTargetAngle(double theta);
     // 回転角速度の目標値を設定
     void setTargetAngularVelocity(double omega);
-    // 現在の座標(ロボット位置原点の座標系)を設定
-    void setPosition(double x, double y);
-    // 現在の並進速度(ロボット位置原点の座標系)を設定
-    void setVelocity(double vx, double vy);
-    // 現在の並進加速度(ロボット位置原点の座標系)を設定
-    void setAcceleration(double ax, double ay);
-    // 現在の回転角度の設定
-    void setAngle(double theta);
-    // 現在の回転角速度の設定
-    void setAngularVelocity(double omega);
-    // 現在の回転角加速度の設定
-    void setAngularAcceleration(double alpha);
 
     // 一気に現状を設定する
     void updateFromStateEstimator(const StateEstimator& state);
@@ -106,4 +94,17 @@ private:
     TargetMode angle_target_mode = TargetMode::Velocity;
 
     WheelController<3> wheel_v_controller;
+
+    // 現在の座標(ロボット位置原点の座標系)を設定
+    void setPosition(double x, double y);
+    // 現在の並進速度(ロボット位置原点の座標系)を設定
+    void setVelocity(double vx, double vy);
+    // 現在の並進加速度(ロボット位置原点の座標系)を設定
+    void setAcceleration(double ax, double ay);
+    // 現在の回転角度の設定
+    void setAngle(double theta);
+    // 現在の回転角速度の設定
+    void setAngularVelocity(double omega);
+    // 現在の回転角加速度の設定
+    void setAngularAcceleration(double alpha);
 };

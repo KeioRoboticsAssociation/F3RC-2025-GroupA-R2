@@ -40,7 +40,6 @@ Velocity WheelOdometry::calculateVelocity(float dt) {
     current_vel.vx = omega_x * wheel_radius;
     current_vel.vy = omega_y * wheel_radius;
 
-
     return current_vel;
 }
 

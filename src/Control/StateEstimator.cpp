@@ -43,27 +43,31 @@ void StateEstimator::update(double dt) {
 }
 
 Pose2D StateEstimator::getAbsolutePosition() const {
-     return fused_pose_; 
-    }
+    return fused_pose_; 
+}
 
+/**
+ * @brief 指定された座標系(frame_num)での相対位置を返します。
+ * @param frame_num 基準となる座標系の番号
+ * @return Pose2D 指定された座標系から見たロボットの姿勢
+ */
 Pose2D StateEstimator::getRelativePosition(int frame_num) const {
     if (frame_num < 0 || static_cast<size_t>(frame_num) >= coordinate_systems_.size()) {
-        // エラー処理: 不正な座標系番号の場合は、現在の座標系での姿勢を返す
+        // エラー処理: 不正な座標系番号の場合は、現在の座標系番号を使用
         frame_num = current_coordinate_system_num;
     }
 
-    // Velocityクラスからワールド座標系での絶対姿勢を取得
-    const Pose2D absolute_pose = imu_odom_.getPose();
+    // ✅ 修正: imu_odom_から直接取得するのではなく、このクラスが保持する融合後の絶対姿勢を使う
+    const Pose2D absolute_pose = getAbsolutePosition();
 
-    // absolute_poseはワールド座標系におけるロボットの絶対姿勢
     // 目標座標系の原点を取得
     const Pose2D& frame_origin = coordinate_systems_[frame_num];
 
-    // ワールド座標系における相対位置を計算
+    // ワールド座標系における相対位置ベクトルを計算
     double rel_x_world = absolute_pose.x - frame_origin.x;
     double rel_y_world = absolute_pose.y - frame_origin.y;
 
-    // 目標座標系の向き(frame_origin.theta)を打ち消すために、-frame_origin.thetaで回転させる
+    // 目標座標系の向きに合わせて、相対位置ベクトルを回転
     const double rotation_angle = -frame_origin.theta;
     const double cos_rot = cos(rotation_angle);
     const double sin_rot = sin(rotation_angle);
@@ -71,7 +75,6 @@ Pose2D StateEstimator::getRelativePosition(int frame_num) const {
     Pose2D relative_pose;
     relative_pose.x = rel_x_world * cos_rot - rel_y_world * sin_rot;
     relative_pose.y = rel_x_world * sin_rot + rel_y_world * cos_rot;
-    //https://youta-blog.com/rotate_point/
 
     // 相対的な向きを計算
     relative_pose.theta = absolute_pose.theta - frame_origin.theta;
@@ -97,7 +100,6 @@ void StateEstimator::resetCoordinateSystem() {
     current_coordinate_system_num = coordinate_systems_.size() - 1;
 }
 
-
 std::pair<double,double> StateEstimator::getVelocity() const { return fused_velocity_; }
 std::pair<double,double> StateEstimator::getAcceleration() const { return fused_acceleration_; }
 double StateEstimator::getAngularVelocity() const { return db_.getAngularVelocity(); }
@@ -109,14 +111,3 @@ LimitSwitchStatus StateEstimator::getLimitSwitchStatus() const {
 }
 std::pair<double,double> StateEstimator::getOneDerivative() const { return one_derivative_; }
 std::pair<double,double> StateEstimator::getTwoDerivative() const { return two_derivative_; }
-
-
-
-// Pose2D Feedback::getPosition(const std::string& frame_name) {
-//     // "WorldFrame" は座標系0とする
-//     if (frame_name == "WorldFrame") {
-//         return getPosition(0);
-//     }
-//     // それ以外の名前付き座標系は未実装のため、現在の座標系を返す
-//     return getPosition(current_coordinate_system_num);
-// }

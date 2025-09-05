@@ -55,17 +55,17 @@ void BehaviorController::setTargetPosition(double x, double y)
     xy_target_mode = TargetMode::Position;
 }
 
+void BehaviorController::setTargetAngle(double theta)
+{
+    target_angle = theta;
+    angle_target_mode = TargetMode::Position;
+}
+
 void BehaviorController::setTargetVelocity(double vx, double vy)
 {
     target_velocity_x = vx;
     target_velocity_y = vy;
     xy_target_mode = TargetMode::Velocity;
-}
-
-void BehaviorController::setTargetAngle(double theta)
-{
-    target_angle = theta;
-    angle_target_mode = TargetMode::Position;
 }
 
 void BehaviorController::setTargetAngularVelocity(double omega)
@@ -107,37 +107,41 @@ void BehaviorController::setAngularAcceleration(double alpha)
     current_acceleration_angle = alpha;
 }
 
+/**
+ * @brief 制御モードに応じて目標速度(Twist)を計算します。
+ * * @return Twist 目標の並進速度(vx, vy)と角速度(omega)
+ */
 Twist BehaviorController::calculateTargetVelocity()
 {
     double x_output;
     double y_output;
     double angle_output;
-    x_output = x_pid_controller.calculate(target_pos_x - current_pos_x);
-    y_output = y_pid_controller.calculate(target_pos_y - current_pos_y);
-    angle_output = angle_pid_controller.calculate(target_angle - current_angle);
 
-    
+    // XY方向の目標速度を計算
+    if (xy_target_mode == TargetMode::Position)
+    {
+        // 位置制御モード：位置偏差からPIDで目標速度を計算
+        x_output = x_pid_controller.calculate(target_pos_x - current_pos_x);
+        y_output = y_pid_controller.calculate(target_pos_y - current_pos_y);
+    }
+    else // TargetMode::Velocity
+    {
+        // 速度制御モード：設定された目標速度をそのまま使用
+        x_output = target_velocity_x;
+        y_output = target_velocity_y;
+    }
 
-    //if (xy_target_mode == TargetMode::Position)
-    // {
-    //     x_output = x_pid_controller.calculate(target_pos_x - current_pos_x);
-    //     y_output = y_pid_controller.calculate(target_pos_y - current_pos_y);
-    // }
-    // else
-    // {
-    //     x_output = target_velocity_x;
-    //     y_output = target_velocity_y;
-    // }
-
-    // double angle_output;
-    // if (angle_target_mode == TargetMode::Position)
-    // {
-    //     angle_output = angle_pid_controller.calculate(target_angle - current_angle);
-    // }
-    // else
-    // {
-    //     angle_output = target_velocity_angle;
-    // }
+    // 角度（回転）の目標速度（角速度）を計算
+    if (angle_target_mode == TargetMode::Position)
+    {
+        // 角度制御モード：角度偏差からPIDで目標角速度を計算
+        angle_output = angle_pid_controller.calculate(target_angle - current_angle);
+    }
+    else // TargetMode::Velocity
+    {
+        // 角速度制御モード：設定された目標角速度をそのまま使用
+        angle_output = target_velocity_angle;
+    }
 
     // ==========================================================
     //                        NaNチェック
@@ -152,12 +156,6 @@ Twist BehaviorController::calculateTargetVelocity()
         return Twist{0.0f, 0.0f, 0.0f};
     }
     // ==========================================================
-
-
-    // printf("error_x:%f error_y:%f error_angle:%f\n",
-    //    target_pos_x - current_pos_x,
-    //    target_pos_y - current_pos_y,
-    //    target_angle - current_angle);
 
     return Twist{(float)x_output, (float)y_output, (float)angle_output};
 }
@@ -175,45 +173,29 @@ TwistAccel BehaviorController::calculateTargetAccel(){
     ay_output = vy_pid_controller.calculate(target_velocity_y - current_velocity_y);
     angular_acceleratior_output = omega_pid_controller.calculate(target_velocity_angle - current_velocity_angle);
 
-    printf("ay_output:%f, %f\n", target_velocity_y, current_velocity_y);
-    printf("cal_vel:%f, %f, %f\n", ax_output, ay_output, angular_acceleratior_output);
+    extern int log_cnt;
+    if (log_cnt == 0) {
+        printf("ax_output:%f, %f\n", target_velocity_x, current_velocity_x);
+        printf("ay_output:%f, %f\n", target_velocity_y, current_velocity_y);
+        printf("angular_acceleratior_output:%f, %f\n", target_velocity_angle, current_velocity_angle);
+        printf("cal_vel:%f, %f, %f\n", ax_output, ay_output, angular_acceleratior_output);
+    }
 
     return TwistAccel{(float)ax_output, (float)ay_output, (float)angular_acceleratior_output };
 }
 
 
-
+/**
+ * @brief 計算された目標速度をモーターコントローラに設定します。
+ * この関数を周期的に呼び出すことで、ロボットの制御を行います。
+ */
 void BehaviorController::setMotor(){
-
-    // オムニホイールの配置を設定
-    // wheel_v_controller(config, {&FrontMotorController, &RearLeftMotorController, &RearRightMotorController})(config, {&FrontMotorController, &RearLeftMotorController, &RearRightMotorController});
-
-    if (xy_target_mode == TargetMode::Position){
-        wheel_v_controller.setTargetTwist(calculateTargetVelocity());
-    }else if(xy_target_mode == TargetMode::Velocity){
-        // 10ms周期
-        float dt = 0.01f;
-        wheel_v_controller.setTargetTwistAccel(calculateTargetAccel(), dt);
-        //ループでの呼び出し前提であることに注意
-        wait_us(10000);
-    }
+    // 制御モードに応じて計算された目標速度(Twist)を取得
+    Twist target_twist = calculateTargetVelocity();
     
-    printf("前方カウント数：%d\n",FrontEncoder.getCount());
-    printf("左後方カウント数：%d\n",RearLeftEncoder.getCount());
-    printf("右後方カウント数：%d\n",RearRightEncoder.getCount());
-
-    //std::cout << controller.twistToMotorSpeeds(tw) << std::endl;
-
-    // printf("calculateTargetVelocity().vx:%f\n", calculateTargetVelocity().vx);
-    // printf("calculateTargetVelocity().vy:%f\n", calculateTargetVelocity().vy);
-    // printf("calculateTargetVelocity().omega:%f\n", calculateTargetVelocity().omega);
-    
-   
-    // printf("twistToMotorSpeeds[0]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[0]);
-    // printf("twistToMotorSpeeds[1]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[1]);
-    // printf("twistToMotorSpeeds[2]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[2]);
-
-
+    // OmniWheelVelocityControllerに目標速度をセット
+    // これにより、内部で各モーターの速度PID制御が実行されます
+    wheel_v_controller.setTargetTwist(target_twist);
 }
 
 void BehaviorController::stop(){
@@ -227,10 +209,6 @@ void BehaviorController::test(){
     RearLeftMotor.setDuty(0.5f);
     RearRightMotor.setDuty(0.5f);
     wait_us(1000000);
-    // printf("FrontEncoder:%d\n", FrontEncoder.getCount());
-    // printf("RearLeftEncoder:%d\n", RearLeftEncoder.getCount());
-    // printf("RearRightEncoder:%d\n", RearRightEncoder.getCount());
-
 }
 
 
