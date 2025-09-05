@@ -26,11 +26,11 @@ void _main() {
         auto linAcc = imu.getLinearAcceleration();
         bool calibrated = imu.isCalibrated();
 
+        printf("\n------------------------------------------------------------\n");
         printf("                    Yaw: %7.2f, Pitch: %7.2f, Roll: %7.2f\n", yaw, pitch, roll);
         printf("   Angular Velocity - X: %7.2f,     Y: %7.2f,    Z: %7.2f\n", angVel.x, angVel.y, angVel.z);
         printf("Linear Acceleration - X: %7.2f,     Y: %7.2f,    Z: %7.2f\n", linAcc.x, linAcc.y, linAcc.z);
         printf("             Calibrated: %7s\n", calibrated ? "Yes" : "No");
-        printf("------------------------------------------------------------\n");
 
         ThisThread::sleep_for(1000ms);
     }
