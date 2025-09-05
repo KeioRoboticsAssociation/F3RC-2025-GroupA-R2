@@ -40,6 +40,13 @@ struct Twist
     float omega; // 角速度(rad/s)
 };
 
+struct TwistAccel
+{
+    float ax;                   // 速度(x [rps])
+    float ay;                   // 速度(y [rps])
+    float angular_acceleratio;  // 角速度(rad/s)
+};
+
 struct WheelConfig
 {
     float wheel_radius; // 車輪の半径 [mm]

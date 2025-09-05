@@ -9,6 +9,7 @@
 #include "variable.hpp"
 #include "Parts/DCMotor.hpp"
 #include "Control/StateEstimator.hpp"
+#include "Mechanism/WheelController.hpp"
 
 enum class TargetMode
 {
@@ -22,6 +23,7 @@ public:
     
     //=====================================================================================
     //　 以下、使用するメソッド一覧　(速度がおすすめ)　※これらメソッドは原則ループ内で呼び出し
+    //   加速度指定は未だ未実装
     //=====================================================================================
 
     BehaviorController(PIDGain x_pid_gain, PIDGain y_pid_gain, PIDGain angle_pid_gain);
@@ -49,15 +51,17 @@ public:
     // 一気に現状を設定する
     void updateFromStateEstimator(const StateEstimator& state);
 
-    // PID制御で目標速度を算出する
+    // 位置のPID制御で目標速度を算出する
     Twist calculateTargetVelocity();
+    // 速度のPID制御で目標加速度を算出する
+    TwistAccel calculateTargetAccel();
     // 実際に動かす
     void setMotor();
     // 完全に停止する
     void stop();
 
     void test();
-
+    void setPGain(float p);
     
 
     double current_pos_x;
@@ -91,10 +95,15 @@ private:
     PIDController<double> x_pid_controller;
     PIDController<double> y_pid_controller;
     PIDController<double> angle_pid_controller;
+    PIDController<double> vx_pid_controller;
+    PIDController<double> vy_pid_controller;
+    PIDController<double> omega_pid_controller;
     // calculateTargetVelocityで扱うx, yの目標が位置か速度のどちらなのか。
     // true: 位置, false: 速度
     TargetMode xy_target_mode = TargetMode::Velocity;
     // calculateTargetVelocityで扱うangleの目標が位置か速度のどちらなのか。
     // true: 位置, false: 速度
     TargetMode angle_target_mode = TargetMode::Velocity;
+
+    WheelController<3> wheel_v_controller;
 };

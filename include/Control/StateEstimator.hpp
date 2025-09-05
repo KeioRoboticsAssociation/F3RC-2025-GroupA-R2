@@ -105,6 +105,10 @@ public:
     // void setAngularAcceleration(double aa);
     // void setIRSensorRaw(float raw);
 
+    // float getTheta() const { return current_theta; }
+    // float getOmega() const { return current_omega; }
+    float getAlpha() const { return (current_omega - prev_omega); }
+
 private:
     // Databaseへの参照
     Database& db_;// getAcceleration()のために保持
@@ -122,6 +126,12 @@ private:
     // ワールド座標系から見た各座標系の原点
     std::vector<Pose2D> coordinate_systems_;
     int current_coordinate_system_num;
+
+
+    // 回転運動に関する追加メンバ
+    float current_theta = 0.0f;
+    float current_omega = 0.0f;
+    float prev_omega = 0.0f;
 };
 
 

@@ -12,8 +12,8 @@ template <typename T>
 class PIDController
 {
 public:
-    PIDController() : gain({0.0f, 0.0f, 0.0f, 1}) {};          // デフォルトコンストラクタ
-    PIDController(PIDGain pid_gain) : gain(pid_gain) {};       // ゲインを与えて初期化
+    PIDController() : gain({1.0f, 0.0f, 0.0f, 1}) {}           // デフォルトコンストラクタ
+    PIDController(PIDGain pid_gain) : gain(pid_gain) {}        // ゲインを与えて初期化
     PIDController(float kp, float ki, float kd, int frequency) // ゲインを与えて初期化
     {
         gain.kp = kp;
@@ -25,36 +25,33 @@ public:
     // 偏差を与えると操作量を返す。
     T calculate(T error)
     {
-        // frequency が 0 なら 1 に置き換える（安全策）
         int freq = (gain.frequency > 0) ? gain.frequency : 1;
 
         T output = error * gain.kp +
-                integral * (gain.ki / freq) +
-                (error - prevError) * gain.kd * freq;
+                   integral * (gain.ki / freq) +
+                   (error - prevError) * gain.kd * freq;
 
-        prevError = error;   // 前回の偏差を更新
-        integral += error;   // 積分値を更新
+        prevError = error;
+        integral += error;
 
         return output;
-    };
+    }
 
-    // 積分値をリセット
     void reset()
     {
-        integral = T{}; // 積分値をリセット
-    };
+        integral = T{};
+        prevError = T{};
+    }
 
-    // 周波数を変更
     void setFrequency(int frequency)
     {
-        gain.frequency = frequency; // 周波数を変更
-    };
+        gain.frequency = frequency;
+    }
 
-    // 周波数を取得
     int getFrequency()
     {
-        return gain.frequency; // 周波数を取得
-    };
+        return gain.frequency;
+    }
 
     // ゲインを変更
     void setGain(float kp, float ki, float kd)
@@ -62,16 +59,18 @@ public:
         gain.kp = kp;
         gain.ki = ki;
         gain.kd = kd;
-    };
+    }
 
-    // ゲインを変更
     void setGain(PIDGain pid_gain)
     {
         gain = pid_gain;
-    };
+    }
+
+    // Pゲインだけ変更
+    void setP(float p) { gain.kp = p; }
 
 private:
-    T integral = T{};  // 積分値
-    T prevError = T{}; // 前回の偏差
-    PIDGain gain;      // ゲイン
+    T integral = T{};
+    T prevError = T{};
+    PIDGain gain;
 };

@@ -18,6 +18,8 @@ void StateEstimator::update(double dt) {
     auto wheel_vel = wheel_odom_.calculateVelocity(dt);
     auto wheel_acc = wheel_odom_.calculateAcceleration(dt);
 
+    // 1.5 駆動輪エンコーダーの速度・加速度
+
     // 2. IMUによる速度・位置更新
     imu_odom_.update(dt);
     auto imu_vel = imu_odom_.getVelocity();
@@ -25,8 +27,8 @@ void StateEstimator::update(double dt) {
     double imu_ang_vel = db_.getAngularVelocity();
 
     // 3. 融合（簡易相補フィルタ）
-    fused_velocity_.first  = 0.8 * imu_vel.first  + 0.2 * wheel_vel.vx;
-    fused_velocity_.second = 0.8 * imu_vel.second + 0.2 * wheel_vel.vy;
+    fused_velocity_.first  = 0.0 * imu_vel.first  + 1.0 * wheel_vel.vx;
+    fused_velocity_.second = 0.0 * imu_vel.second + 1.0 * wheel_vel.vy;
     fused_acceleration_ = { wheel_acc.ax, wheel_acc.ay };
     fused_pose_ = imu_pose;
 

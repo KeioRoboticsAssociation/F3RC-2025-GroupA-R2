@@ -3,6 +3,30 @@
 #include <cmath> 
 
 
+// オムニホイールの配置を設定
+float WHEEL_RAD_ = BehaviorControllerParameter::WHEEL_RAD; // 車輪の半径
+float TREAD_RAD_ = BehaviorControllerParameter::TREAD_RAD; // 中心から車輪までの距離
+std::array<WheelConfig, 3> config = {
+    WheelConfig{
+        .wheel_radius = WHEEL_RAD_, // 車輪の半径
+        .wheel_x = 0.0, // 車輪のx座標
+        .wheel_y = TREAD_RAD_,  // 車輪のy座標
+        .wheel_theta = M_PI // 車輪の角度
+    }, 
+    WheelConfig{
+        .wheel_radius = WHEEL_RAD_, 
+        .wheel_x = - M_SQRT3 / 2 * TREAD_RAD_,
+        .wheel_y = - 0.5 * TREAD_RAD_, 
+        .wheel_theta = M_PI / 3
+    }, 
+    WheelConfig{
+        .wheel_radius = WHEEL_RAD_, 
+        .wheel_x = + M_SQRT3 / 2 * TREAD_RAD_, 
+        .wheel_y = - 0.5 * TREAD_RAD_,
+        .wheel_theta = 5 * M_PI / 3
+    }
+};
+
 BehaviorController::BehaviorController(PIDGain x_pid_gain, PIDGain y_pid_gain, PIDGain angle_pid_gain)
     : FrontMotor(PwmOutPins::OMUNI_MOTOR1_PWM, DigitalOutPins::OMUNI_MOTOR1_DIR),
       FrontEncoder(InterruptInPins::OMUNI_ENCODER1_A, DigitalInPins::OMUNI_ENCODER1_B),
@@ -15,11 +39,13 @@ BehaviorController::BehaviorController(PIDGain x_pid_gain, PIDGain y_pid_gain, P
       RearRightMotorController(RearRightMotor, RearRightEncoder),
       x_pid_controller(x_pid_gain),
       y_pid_controller(y_pid_gain),
-      angle_pid_controller(angle_pid_gain)
+      angle_pid_controller(angle_pid_gain),
+      wheel_v_controller(config, {&FrontMotorController, &RearLeftMotorController, &RearRightMotorController})
       {
         x_pid_controller.setFrequency(x_pid_gain.frequency);
         y_pid_controller.setFrequency(y_pid_gain.frequency);
         angle_pid_controller.setFrequency(angle_pid_gain.frequency);
+        
       }
 
 void BehaviorController::setTargetPosition(double x, double y)
@@ -85,26 +111,33 @@ Twist BehaviorController::calculateTargetVelocity()
 {
     double x_output;
     double y_output;
-    if (xy_target_mode == TargetMode::Position)
-    {
-        x_output = x_pid_controller.calculate(target_pos_x - current_pos_x);
-        y_output = y_pid_controller.calculate(target_pos_y - current_pos_y);
-    }
-    else
-    {
-        x_output = target_velocity_x;
-        y_output = target_velocity_y;
-    }
-
     double angle_output;
-    if (angle_target_mode == TargetMode::Position)
-    {
-        angle_output = angle_pid_controller.calculate(target_angle - current_angle);
-    }
-    else
-    {
-        angle_output = target_velocity_angle;
-    }
+    x_output = x_pid_controller.calculate(target_pos_x - current_pos_x);
+    y_output = y_pid_controller.calculate(target_pos_y - current_pos_y);
+    angle_output = angle_pid_controller.calculate(target_angle - current_angle);
+
+    
+
+    //if (xy_target_mode == TargetMode::Position)
+    // {
+    //     x_output = x_pid_controller.calculate(target_pos_x - current_pos_x);
+    //     y_output = y_pid_controller.calculate(target_pos_y - current_pos_y);
+    // }
+    // else
+    // {
+    //     x_output = target_velocity_x;
+    //     y_output = target_velocity_y;
+    // }
+
+    // double angle_output;
+    // if (angle_target_mode == TargetMode::Position)
+    // {
+    //     angle_output = angle_pid_controller.calculate(target_angle - current_angle);
+    // }
+    // else
+    // {
+    //     angle_output = target_velocity_angle;
+    // }
 
     // ==========================================================
     //                        NaNチェック
@@ -129,45 +162,56 @@ Twist BehaviorController::calculateTargetVelocity()
     return Twist{(float)x_output, (float)y_output, (float)angle_output};
 }
 
-// オムニホイールの配置を設定
-float WHEEL_RAD_ = BehaviorControllerParameter::WHEEL_RAD; // 車輪の半径
-float TREAD_RAD_ = BehaviorControllerParameter::TREAD_RAD; // 中心から車輪までの距離
-std::array<WheelConfig, 3> config = {
-    WheelConfig{
-        .wheel_radius = WHEEL_RAD_, // 車輪の半径
-        .wheel_x = 0.0, // 車輪のx座標
-        .wheel_y = TREAD_RAD_,  // 車輪のy座標
-        .wheel_theta = M_PI // 車輪の角度
-    }, 
-    WheelConfig{
-        .wheel_radius = WHEEL_RAD_, 
-        .wheel_x = - M_SQRT3 / 2 * TREAD_RAD_,
-        .wheel_y = - 0.5 * TREAD_RAD_, 
-        .wheel_theta = M_PI / 3
-    }, 
-    WheelConfig{
-        .wheel_radius = WHEEL_RAD_, 
-        .wheel_x = + M_SQRT3 / 2 * TREAD_RAD_, 
-        .wheel_y = - 0.5 * TREAD_RAD_,
-        .wheel_theta = 5 * M_PI / 3
-    }
-};
+TwistAccel BehaviorController::calculateTargetAccel(){
+    double ax_output;
+    double ay_output;
+    double angular_acceleratior_output;
+
+    vx_pid_controller.setGain({10.0f,0.0f,0.0f,1});
+    vy_pid_controller.setGain({10.0f,0.0f,0.0f,1});
+    omega_pid_controller.setGain({10.0f,0.0f,0.0f,1});
+
+    ax_output = vx_pid_controller.calculate(target_velocity_x - current_velocity_x);
+    ay_output = vy_pid_controller.calculate(target_velocity_y - current_velocity_y);
+    angular_acceleratior_output = omega_pid_controller.calculate(target_velocity_angle - current_velocity_angle);
+
+    printf("ay_output:%f, %f\n", target_velocity_y, current_velocity_y);
+    printf("cal_vel:%f, %f, %f\n", ax_output, ay_output, angular_acceleratior_output);
+
+    return TwistAccel{(float)ax_output, (float)ay_output, (float)angular_acceleratior_output };
+}
+
+
 
 void BehaviorController::setMotor(){
 
     // オムニホイールの配置を設定
-    WheelController<3> controller(config, {&FrontMotorController, &RearLeftMotorController, &RearRightMotorController});
+    // wheel_v_controller(config, {&FrontMotorController, &RearLeftMotorController, &RearRightMotorController})(config, {&FrontMotorController, &RearLeftMotorController, &RearRightMotorController});
 
-    controller.setTargetTwist(calculateTargetVelocity());
+    if (xy_target_mode == TargetMode::Position){
+        wheel_v_controller.setTargetTwist(calculateTargetVelocity());
+    }else if(xy_target_mode == TargetMode::Velocity){
+        // 10ms周期
+        float dt = 0.01f;
+        wheel_v_controller.setTargetTwistAccel(calculateTargetAccel(), dt);
+        //ループでの呼び出し前提であることに注意
+        wait_us(10000);
+    }
+    
+    printf("前方カウント数：%d\n",FrontEncoder.getCount());
+    printf("左後方カウント数：%d\n",RearLeftEncoder.getCount());
+    printf("右後方カウント数：%d\n",RearRightEncoder.getCount());
+
     //std::cout << controller.twistToMotorSpeeds(tw) << std::endl;
-   
-    printf("twistToMotorSpeeds[0]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[0]);
-    printf("twistToMotorSpeeds[1]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[1]);
-    printf("twistToMotorSpeeds[2]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[2]);
 
-    // printf("FrontEncoder:%f\n", FrontEncoder.getCount());
-    // printf("RearLeftEncoder:%f\n", RearLeftEncoder.getCount());
-    // printf("RearRightEncoder:%f\n", RearRightEncoder.getCount());
+    // printf("calculateTargetVelocity().vx:%f\n", calculateTargetVelocity().vx);
+    // printf("calculateTargetVelocity().vy:%f\n", calculateTargetVelocity().vy);
+    // printf("calculateTargetVelocity().omega:%f\n", calculateTargetVelocity().omega);
+    
+   
+    // printf("twistToMotorSpeeds[0]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[0]);
+    // printf("twistToMotorSpeeds[1]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[1]);
+    // printf("twistToMotorSpeeds[2]:%f\n", controller.twistToMotorSpeeds(calculateTargetVelocity())[2]);
 
 
 }
@@ -202,4 +246,10 @@ void BehaviorController::updateFromStateEstimator(const StateEstimator& state) {
     setAcceleration(acc.first, acc.second);
     setAngle(ang);
     setAngularVelocity(ang_vel);
+}
+
+void BehaviorController::setPGain(float p) {
+    x_pid_controller.setP(p);
+    y_pid_controller.setP(p);
+    angle_pid_controller.setP(p);
 }
