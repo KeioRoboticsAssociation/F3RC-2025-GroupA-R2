@@ -15,8 +15,8 @@ StateEstimator::StateEstimator(Database& db, WheelOdometry& wheel_odom, ImuOdome
 //情報を回収する
 void StateEstimator::update(double dt) {
     // 1. WheelOdometryの速度・加速度
-    auto wheel_vel = wheel_odom_.calculateVelocity(dt);
-    auto wheel_acc = wheel_odom_.calculateAcceleration(dt);
+    auto wheel_vel = wheel_odom_.getVelocity();
+    auto wheel_acc = wheel_odom_.getAcceleration();
 
     // 1.5 駆動輪エンコーダーの速度・加速度
 

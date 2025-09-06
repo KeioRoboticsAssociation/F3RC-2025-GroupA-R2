@@ -27,6 +27,9 @@ void LimitSwitch::init() {
 }
 
 bool LimitSwitch::isPressed() {
+    // デバッグ用
+    return false;
+    
     // 生入力値取得
     bool rawState = getRawInput();
     

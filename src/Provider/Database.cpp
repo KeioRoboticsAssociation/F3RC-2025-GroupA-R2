@@ -1,8 +1,8 @@
 #include "Provider/Database.hpp"
 #include <math.h>
 
-Database::Database(Imu &imu, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch)
-    : imu(imu), front_tof_sensor(front_tof_sensor), side_tof_sensor(side_tof_sensor), front_limit_switch(front_limit_switch), side_limit_switch(side_limit_switch)
+Database::Database(Imu &imu, WheelOdometry &wheel_odom, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch)
+    : imu(imu), wheel_odom(wheel_odom), front_tof_sensor(front_tof_sensor), side_tof_sensor(side_tof_sensor), front_limit_switch(front_limit_switch), side_limit_switch(side_limit_switch)
 {
     this->imu.init();
     front_limit_switch.init();
@@ -11,9 +11,8 @@ Database::Database(Imu &imu, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSe
 
 std::pair<double, double> Database::getAcceleration()
 {
-    double x = imu.getLinearAcceleration().x;
-    double y = imu.getLinearAcceleration().y;
-    return {x, y};
+    auto acc = wheel_odom.getAcceleration();
+    return {acc.ax, acc.ay};
 }
 
 double Database::getAngularVelocity()

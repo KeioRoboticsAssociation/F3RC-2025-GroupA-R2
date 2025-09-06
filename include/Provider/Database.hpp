@@ -4,11 +4,12 @@
 #include "Parts/LimitSwitch.hpp"
 #include "Parts/TimeOfFlightSensor.hpp"
 #include "Parts/Encoder.hpp"
+#include "Provider/WheelOdometry.hpp"
 
 class Database
 {
 public:
-    Database(Imu &imu, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch);
+    Database(Imu &imu, WheelOdometry &wheel_odom, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch);
     // 加速度センサー由来のx, y方向の加速度[m/s^2]を取得する
     std::pair<double, double> getAcceleration();
     // 加速度センサー由来の角速度[rad/s]を取得する
@@ -24,6 +25,7 @@ public:
 
 private:
     Imu &imu;
+    WheelOdometry &wheel_odom;
     TimeOfFlightSensor front_tof_sensor;
     TimeOfFlightSensor side_tof_sensor;
     LimitSwitch front_limit_switch;

@@ -3,29 +3,54 @@
 //==================================================
 #pragma once
 #include "Parts/Encoder.hpp"
-#include <cmath>
+#include "mbed.h" // Timerのために追加
 
-struct Velocity { float vx; float vy; };
-struct Acceleration { float ax; float ay; };
+// 速度と加速度を格納する構造体
+struct Velocity { float vx = 0.0f; float vy = 0.0f; };
+struct Acceleration { float ax = 0.0f; float ay = 0.0f; };
 
 class WheelOdometry {
 public:
-    WheelOdometry(Encoder* x_encoder, Encoder* y_encoder, float wheel_radius, int resolution);
+    /**
+     * @brief コンストラクタ
+     * @param x_encoder X軸方向のエンコーダへのポインタ
+     * @param y_encoder Y軸方向のエンコーダへのポインタ
+     * @param wheel_radius 測定輪の半径 (m)
+     * @param counts_per_revolution エンコーダの1回転あたりのカウント数 (CPR)。4逓倍した値を指定してください。
+     */
+    WheelOdometry(Encoder* x_encoder, Encoder* y_encoder, float wheel_radius, int counts_per_revolution);
 
-    Velocity calculateVelocity(float dt);
-    Acceleration calculateAcceleration(float dt);
+    /**
+     * @brief 速度と加速度を更新します。この関数を定期的に呼び出してください。
+     */
+    void update();
+
+    /**
+     * @brief 現在の速度を取得します。
+     * @return Velocity構造体 {vx, vy} (m/s)
+     */
+    Velocity getVelocity() const;
+
+    /**
+     * @brief 現在の加速度を取得します。
+     * @return Acceleration構造体 {ax, ay} (m/s^2)
+     */
+    Acceleration getAcceleration() const;
 
 private:
-    float countToRadians(int delta_count) const;
+    Encoder* x_encoder_;
+    Encoder* y_encoder_;
+    
+    // 物理パラメータ
+    const float distance_per_count_; // 1カウントあたりの移動距離 (m)
 
-    Encoder* x_encoder;
-    Encoder* y_encoder;
-    float wheel_radius;
-    int resolution;
-
-    int prev_count_x;
-    int prev_count_y;
-
-    Velocity current_vel;
-    Velocity prev_vel;
+    // 内部状態
+    int prev_count_x_;
+    int prev_count_y_;
+    
+    Velocity current_velocity_;
+    Acceleration current_acceleration_;
+    
+    // 時間計測用
+    Timer timer_;
 };

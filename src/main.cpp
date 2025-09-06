@@ -15,15 +15,15 @@ Imu imu(PinsForSensor::IMU_SDA, PinsForSensor::IMU_SCL);
 TimeOfFlightSensor front_tof(PinsForSensor::TOF1), side_tof(PinsForSensor::TOF2);
 LimitSwitch front_limit(LimitSwitchPins::FRONT_LIMIT), side_limit(LimitSwitchPins::SIDE_LIMIT);
 
-// Database
-Database db(imu, front_tof, side_tof, front_limit, side_limit);
-
 // エンコーダ（測定輪用）
 Encoder x_encoder(InterruptInPins::MEASURING_ENCODER1_A, DigitalInPins::MEASURING_ENCODER1_B);
 Encoder y_encoder(InterruptInPins::MEASURING_ENCODER2_A, DigitalInPins::MEASURING_ENCODER2_B);
 
 // WheelOdometry
 WheelOdometry wheel_odom(&x_encoder, &y_encoder, /*wheel_radius=*/0.03f, /*resolution=*/2048);
+
+// Database
+Database db(imu, wheel_odom, front_tof, side_tof, front_limit, side_limit);
 
 // ImuOdometry
 ImuOdometry imu_odom(db);
@@ -49,7 +49,7 @@ int main() {
     // 自己位置の登録
     state_estimator.resetCoordinateSystem();
 
-    // 目標位置 (2.0, 0.0) と目標角度 π/2 rad
+    // 目標位置 (0.0, 0.0) と目標角度 π/2 rad
     controller.setTargetPosition(0.0, 0.0);
     controller.setTargetAngle(M_PI / 2.);
 
@@ -70,6 +70,7 @@ int main() {
         }
 
         // 状態推定
+        wheel_odom.update();
         state_estimator.update(dt);
 
         // 推定結果を BehaviorController に渡す
@@ -79,6 +80,8 @@ int main() {
         double ang_vel = state_estimator.getAngularVelocity();
 
         if (log_cnt == 0) {
+            printf("IMU: yaw=%f, pitch=%f, roll=%f\n", imu.getYaw(), imu.getPitch(), imu.getRoll());
+
             printf("Estimated Pose: x=%f, y=%f, theta=%f\n", pose.x, pose.y, pose.theta);
             printf("Estimated Velocity: vx=%f, vy=%f\n", vel.first, vel.second);
             printf("Estimated Acceleration: ax=%f, ay=%f\n", acc.first, acc.second);
