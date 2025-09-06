@@ -67,6 +67,6 @@ public:
 
 private:
     std::array<WheelVector, N> wheel_vectors;
-    float max_speed;
     std::array<MotorController *, N> motors;
+    float max_speed;
 };
