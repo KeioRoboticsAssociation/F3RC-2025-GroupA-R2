@@ -5,6 +5,7 @@
 
 #include "OmniWheel.hpp"
 #include "Odometry.hpp"
+#include "CoalArmController.hpp"
 
 UnbufferedSerial pc(USBTX, USBRX); // PCとのシリアル通信
 
@@ -20,6 +21,12 @@ Encoder encoder4(PinConfig::ODO_X_ENC_A, PinConfig::ODO_X_ENC_B); // X方向測�
 Encoder encoder5(PinConfig::ODO_Y_ENC_A, PinConfig::ODO_Y_ENC_B); // Y方向測定輪
 Imu imu(PinConfig::IMU_SDA, PinConfig::IMU_SCL); // IMU
 Odometry odometry(encoder4, encoder5, imu);
+
+DCMotor coal_lift_motor(PinConfig::ARM1_LIFT_PWM, PinConfig::ARM1_LIFT_DIR);
+Encoder coal_lift_encoder(PinConfig::ARM1_LIFT_ENC_A, PinConfig::ARM1_LIFT_ENC_B);
+PseudoServo coal_lift(coal_lift_motor, coal_lift_encoder);
+ServoMotor coal_gripper(PinConfig::ARM1_GRIPPER_PWM, RobotConfig::SERVO_MIN_PULSE_WIDTH, RobotConfig::SERVO_MAX_PULSE_WIDTH);
+CoalArmController coal_arm_controller(coal_lift, coal_gripper);
 
 const auto CONTROL_PERIOD = 10ms; // 制御周期 10ms
 Timer control_timer;

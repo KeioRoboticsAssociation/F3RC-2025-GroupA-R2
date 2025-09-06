@@ -1,15 +1,15 @@
-#ifndef INCLUDED_VARIABLE_HPP_
-#define INCLUDED_VARIABLE_HPP_
+#ifndef VARIABLE_HPP
+#define VARIABLE_HPP
 
 // Parameters for the oil arm.
 namespace oil_arm_config {
-    // Arm Servo Angles (degrees)
+    // Arm ServoMotor Angles (degrees)
     constexpr float kArmInitialAngle = 90.0f;
     constexpr float kArmExtendAngle = 0.0f;
     constexpr float kArmLiftAngle = 45.0f;
     constexpr float kArmPlaceAngle = 20.0f;
 
-    // Gripper Servo Angles (degrees)
+    // Gripper ServoMotor Angles (degrees)
     constexpr float kGripperOpenAngle = 90.0f;
     constexpr float kGripperCloseAngle = 0.0f;
 }
@@ -42,4 +42,5 @@ namespace BehaviorControllerParameter {
     constexpr float MESURE_WHEEL_RAD = 45.0;    // 測定輪の半径
     constexpr float TREAD_RAD = 210.0;          // 中心から車輪までの距離
 }
-#endif // INCLUDED_VARIABLE_HPP_
+
+#endif // VARIABLE_HPP
