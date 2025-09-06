@@ -50,8 +50,8 @@ int main() {
     state_estimator.resetCoordinateSystem();
 
     // 目標位置 (0.0, 0.0) と目標角度 π/2 rad
-    controller.setTargetPosition(0.0, 0.0);
-    controller.setTargetAngle(M_PI / 2.);
+    controller.setTargetPosition(0.0, 2.0);
+    controller.setTargetAngle(0);
 
     // ------------------------
     // Pゲイン変化用 Timer
