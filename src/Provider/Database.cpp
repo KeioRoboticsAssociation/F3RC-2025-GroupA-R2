@@ -1,12 +1,10 @@
 #include "Provider/Database.hpp"
 #include <math.h>
 
-Database::Database(Imu &imu, WheelOdometry &wheel_odom, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor, LimitSwitch front_limit_switch, LimitSwitch side_limit_switch)
-    : imu(imu), wheel_odom(wheel_odom), front_tof_sensor(front_tof_sensor), side_tof_sensor(side_tof_sensor), front_limit_switch(front_limit_switch), side_limit_switch(side_limit_switch)
+Database::Database(Imu &imu, WheelOdometry &wheel_odom, TimeOfFlightSensor front_tof_sensor, TimeOfFlightSensor side_tof_sensor)
+    : imu(imu), wheel_odom(wheel_odom), front_tof_sensor(front_tof_sensor), side_tof_sensor(side_tof_sensor)
 {
     this->imu.init();
-    front_limit_switch.init();
-    side_limit_switch.init();
 }
 
 std::pair<double, double> Database::getAcceleration()
@@ -28,14 +26,4 @@ bool Database::getFrontTofStatus()
 bool Database::getSideTofStatus()
 {
     return side_tof_sensor.isDetecting();
-}
-
-bool Database::getFrontLimitSwitchStatus()
-{
-    return front_limit_switch.isPressed();
-}
-
-bool Database::getSideLimitSwitchStatus()
-{
-    return side_limit_switch.isPressed();
 }
