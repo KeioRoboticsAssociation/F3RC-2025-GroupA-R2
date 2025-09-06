@@ -12,8 +12,8 @@ template <int N>
 class OdomWheel
 {
 public:
-    OdomWheel(PIDGain pid_gain, const std::array<WheelConfig, N> &wheel_configs, const std::array<MotorController *, N> &motors, const std::array<Encoder *, N> &encoders, chrono::microseconds update_interval = chrono::microseconds(5000))
-        : pid_controller(pid_gain), wheel_controller(wheel_configs, motors), odometry(wheel_configs, encoders, update_interval)
+    OdomWheel(PIDGain pid_gain, const std::array<WheelConfig, N> &wheel_configs, const std::array<MotorController *, N> &motors, const std::array<Encoder *, N> &encoders)
+        : pid_controller(pid_gain), wheel_controller(wheel_configs, motors), odometry(wheel_configs, encoders)
     {
         wheel_controller.setTargetTwist({0.0, 0.0, 0.0});
         odometry.setPose({0.0, 0.0, 0.0});
@@ -21,6 +21,7 @@ public:
 
     void updateTargetTwist()
     {
+        odometry.update();
         Pose current_pose = odometry.getCurrentPose();
         Pose target_pose = getTargetPose();
         printf("current_pose: %f, %f, %f\n", current_pose.x, current_pose.y, current_pose.theta);

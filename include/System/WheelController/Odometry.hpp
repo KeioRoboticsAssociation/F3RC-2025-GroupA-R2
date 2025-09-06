@@ -9,14 +9,12 @@ class Odometry
     static_assert(N > 2, "N must be greater than 2.");
 
 public:
-    Odometry(const array<WheelConfig, N> &wheel_configs, const array<Encoder *, N> &encoders, chrono::microseconds update_interval = chrono::microseconds(5000))
+    Odometry(const array<WheelConfig, N> &wheel_configs, const array<Encoder *, N> &encoders)
         : encoders(encoders)
     {
         wheel_vectors_inv = getWheelVectorInv(wheel_configs);
-        ticker.attach(callback(this, &Odometry::update), update_interval); // オドメトリの更新周期を設定
         setPose({0.0, 0.0, 0.0});
         last_encoder_counts.fill(0);
-        this->update_interval = update_interval;
     }
 
     static array<WheelVectorInv, N> getWheelVectorInv(const array<WheelConfig, N> &wheel_configs)
@@ -93,19 +91,11 @@ public:
 
     int DEBUG_ = 0;
 
-    chrono::microseconds getUpdateInterval()
-    {
-        return update_interval;
-    }
-
 private:
     array<Encoder *, N> encoders;
     array<int, N> last_encoder_counts;
     array<WheelVectorInv, N> wheel_vectors_inv;
     Pose pose;
-    Ticker ticker;
-
-    chrono::microseconds update_interval;
 
     void updatePose(float delta_x, float delta_y, float delta_theta)
     {
