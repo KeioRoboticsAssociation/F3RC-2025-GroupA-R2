@@ -231,7 +231,7 @@ void Imu::update_thread_worker()
         current_calib_status = readByte(BNO055_CALIB_STAT_ADDR);
 
         double yaw_velocity = 0.0;
-        float dt = dt_timer_.read();
+        float dt = std::chrono::duration<float>{dt_timer_.elapsed_time()}.count();
         
         if (dt > 1e-6) // ゼロ除算防止
         {
