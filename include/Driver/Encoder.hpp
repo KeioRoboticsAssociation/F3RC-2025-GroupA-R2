@@ -29,4 +29,5 @@ private:
     int count;
 
     void interrupt(int sgn);
+    void interrupt_reverse(int sgn);
 };
