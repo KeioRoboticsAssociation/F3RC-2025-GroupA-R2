@@ -20,9 +20,7 @@ void MotorController::loop()
 
     // PID制御
     float output = pid_controller.calculate(target_rps - current_rps);
-    printf("output: %f\n", output);
     float duty = last_duty + output / pid_controller.getFrequency();
-    printf("duty1: %f\n", duty);
 
     // デューティ比の制限
     if (duty > max_duty)
@@ -37,7 +35,7 @@ void MotorController::loop()
     }
 
     last_duty = duty;
-    printf("duty2: %f\n", duty);
+    printf("duty: %f\n", duty);
 
     // モーターへの出力
     motor.setDuty(duty);
