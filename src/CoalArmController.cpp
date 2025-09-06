@@ -29,3 +29,7 @@ void CoalArmController::grab() {
 void CoalArmController::release() {
     m_gripper_servo.setAngleDeg(RobotConfig::ARM1_GRIPPER_OPEN_DEG);
 }
+
+bool CoalArmController::isLiftAtTarget(float tolerance_m) {
+    return m_lift_motor.isAtTarget(tolerance_m);
+}

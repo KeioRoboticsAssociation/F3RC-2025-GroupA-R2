@@ -16,6 +16,8 @@ public:
     void grab();
     void release();
 
+    bool isLiftAtTarget(float tolerance_m = 0.001f);
+
 private:
     PseudoServo& m_lift_motor;
     ServoMotor& m_gripper_servo;

@@ -2,15 +2,19 @@
 #define ROBOT_CONFIG_HPP
 
 #include <chrono>
+#include <cmath>
 
 namespace RobotConfig {
     // ロボットの物理パラメータ
-    constexpr float WHEEL_RADIUS = 0.045f; // ホイールの半径 [m]
-    constexpr float BODY_RADIUS = 0.21f;  // 車体中心からホイール中心までの距離 [m]
+    constexpr float WHEEL_RADIUS_M = 0.045f; // ホイールの半径 [m]
+    constexpr float BODY_RADIUS_M = 0.21f;  // 車体中心からホイール中心までの距離 [m]
     constexpr int COUNTS_PER_REV = 2048; // モーター1回転あたりのエンコーダカウント数（ギア比考慮後）
 
     // 制御周期
-    constexpr float CONTROL_PERIOD = 0.01f; // 10ms
+    constexpr float CONTROL_PERIOD_S = 0.01f; // 10ms
+
+    // 円周率
+    constexpr float PI = M_PI;
 
     // 三角関数
     constexpr float COS_120 = -0.5f; // cos(120°)
@@ -18,8 +22,9 @@ namespace RobotConfig {
 
     // 位置制御
     constexpr float POS_CONTROL_KP = 1.0f; // 位置制御の比例ゲイン
-    constexpr float GOAL_THRESHOLD_M = 0.03f; // 目標位置到達の閾値 [m]
-    constexpr float GOAL_THRESHOLD_RAD = 0.03f; // 目標位置到達の閾値 [rad]
+    constexpr float ANGLE_CONTROL_KP = 2.0f; // 角度制御の比例ゲイン
+    constexpr float POS_THRESHOLD_M = 0.03f; // 目標位置到達の閾値 [m]
+    constexpr float ANGLE_THRESHOLD_RAD = 0.03f; // 目標位置到達の閾値 [rad]
 
     // サーボ
     constexpr chrono::microseconds SERVO_MIN_PULSE_WIDTH = 500us; // サーボの最小パルス幅 [μs]
@@ -45,6 +50,7 @@ namespace RobotConfig {
     constexpr float ARM2_LIFT_KD = 0.1f; // 昇降用PID微分ゲイン
     constexpr float ARM2_LIFT_METERS_PER_REV = 0.02f; // 昇降用モーターの1回転あたりの移動距離
     constexpr int ARM2_LIFT_COUNTS_PER_REV = 2048; // 昇降用モーターの1回転あたりのエンコーダカウント数
+    constexpr float ARM_LIFT_HEIGHT_M = 0.15f; // アーム昇降の目標高さ [m]
     constexpr float ARM2_GRIP_KP = 2.0f; // グリッパー用PID比例ゲイン
     constexpr float ARM2_GRIP_KI = 0.0f; // グリッパー用PID積分ゲイン
     constexpr float ARM2_GRIP_KD = 0.05f; // グリッパー用PID微分ゲイン

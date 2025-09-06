@@ -39,3 +39,11 @@ void OilArmController::closeGripper() {
     // RobotConfigで定義された「閉じた状態」の位置を目標に設定
     m_gripper_motor.setPosition(RobotConfig::ARM2_GRIP_CLOSE_ANGLE_DEG);
 }
+
+bool OilArmController::isLiftAtTarget(float tolerance_m) {
+    return m_lift_motor.isAtTarget(tolerance_m);
+}
+
+bool OilArmController::isGripperAtTarget(float tolerance_m) {
+    return m_gripper_motor.isAtTarget(tolerance_m);
+}
