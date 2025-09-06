@@ -84,7 +84,7 @@ int main_3()
     // 左後方
     DCMotor dc2(PwmOutPins::OMUNI_MOTOR2_PWM, DigitalOutPins::OMUNI_MOTOR2_DIR);
     // 右後方
-    DCMotor dc3(PwmOutPins::OMUNI_MOTOR3_PWM, DigitalOutPins::OMUNI_MOTOR3_DIR, true);
+    DCMotor dc3(PwmOutPins::OMUNI_MOTOR3_PWM, DigitalOutPins::OMUNI_MOTOR3_DIR);
 
     MotorController motor1(dc1, encoder1, PIDGain({10, 0, 0, 100}));
     MotorController motor2(dc2, encoder2, PIDGain({10, 0, 0, 100}));
