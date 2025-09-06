@@ -31,34 +31,15 @@ namespace PinConfig {
     constexpr PinName ARM1_LIFT_ENC_A = PC_2; // ENC6: 石炭アーム昇降用エンコーダA相
     constexpr PinName ARM1_LIFT_ENC_B = PC_3; // ENC6: 石炭アーム昇降用エンコーダB相
     constexpr PinName ARM1_GRIPPER_PWM = PA_10; // 石炭アーム掴み用サーボPWM
-}
 
-
-
-namespace DigitalOutPins
-{
-    constexpr PinName PSEUDO_SERVO2_DIR = PB_8 ;     // 疑似サーボ(石油上下)用DC5の方向
-    constexpr PinName PSEUDO_SERVO3_DIR = PB_9 ;     // 疑似サーボ(石油掴む)用DC6の方向
-}
-
-namespace PwmOutPins
-{
-    constexpr PinName PSEUDO_SERVO2_PWM = PC_8 ;     // 疑似サーボ(石油上下)用DC5のPWM 
-    constexpr PinName PSEUDO_SERVO3_PWM = PC_9 ;     // 疑似サーボ(石油掴む)用DC6のPWM
-
-    constexpr PinName SERVO_PWM         = PA_10;     // サーボ(石炭掴む)用PWM
-}
-
-namespace InterruptInPins
-{
-    constexpr PinName PSEUDO_SERVO_ENCODER2_A   = PB_5 ;     // エンコーダー7：疑似サーボ(石油上下)用エンコーダー2のA相
-    constexpr PinName PSEUDO_SERVO_ENCODER3_A   = PA_12 ;     // エンコーダー8：疑似サーボ(石油掴む)用エンコーダー3のA相
-}
-
-namespace DigitalInPins
-{
-    constexpr PinName PSEUDO_SERVO_ENCODER2_B   = PB_4;     // エンコーダー7：疑似サーボ(石油上下)用エンコーダー2のB相
-    constexpr PinName PSEUDO_SERVO_ENCODER3_B   = PC_5;     // エンコーダー8：疑似サーボ(石油掴む)用エンコーダー3のB相
+    constexpr PinName ARM2_LIFT_PWM = PC_8; // DC5: 石油アーム昇降用モーターPWM
+    constexpr PinName ARM2_LIFT_DIR = PB_8; // DC5: 石油アーム昇降用モーター方向
+    constexpr PinName ARM2_LIFT_ENC_A = PB_5; // ENC7: 石油アーム昇降用エンコーダA相
+    constexpr PinName ARM2_LIFT_ENC_B = PB_4; // ENC7: 石油アーム昇降用エンコーダB相
+    constexpr PinName ARM2_GRIPPER_PWM = PC_9; // DC6: 石油アーム掴み用モーターPWM
+    constexpr PinName ARM2_GRIPPER_DIR = PB_9; // DC6: 石油アーム掴み用モーター方向
+    constexpr PinName ARM2_GRIPPER_ENC_A = PA_12; // ENC8: 石油アーム掴み用エンコーダA相
+    constexpr PinName ARM2_GRIPPER_ENC_B = PC_5; // ENC8: 石油アーム掴み用エンコーダB相
 }
 
 namespace PinsForSensor

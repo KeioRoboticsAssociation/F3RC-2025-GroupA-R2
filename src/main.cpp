@@ -6,6 +6,7 @@
 #include "OmniWheel.hpp"
 #include "Odometry.hpp"
 #include "CoalArmController.hpp"
+#include "OilArmController.hpp"
 
 UnbufferedSerial pc(USBTX, USBRX); // PCとのシリアル通信
 
@@ -27,6 +28,14 @@ Encoder coal_lift_encoder(PinConfig::ARM1_LIFT_ENC_A, PinConfig::ARM1_LIFT_ENC_B
 PseudoServo coal_lift(coal_lift_motor, coal_lift_encoder);
 ServoMotor coal_gripper(PinConfig::ARM1_GRIPPER_PWM, RobotConfig::SERVO_MIN_PULSE_WIDTH, RobotConfig::SERVO_MAX_PULSE_WIDTH);
 CoalArmController coal_arm_controller(coal_lift, coal_gripper);
+
+DCMotor oil_lift_motor(PinConfig::ARM2_LIFT_PWM, PinConfig::ARM2_LIFT_DIR);
+Encoder oil_lift_encoder(PinConfig::ARM2_LIFT_ENC_A, PinConfig::ARM2_LIFT_ENC_B);
+PseudoServo oil_lift(oil_lift_motor, oil_lift_encoder);
+DCMotor oil_gripper_motor(PinConfig::ARM2_GRIPPER_PWM, PinConfig::ARM2_GRIPPER_DIR);
+Encoder oil_gripper_encoder(PinConfig::ARM2_GRIPPER_ENC_A, PinConfig::ARM2_GRIPPER_ENC_B);
+PseudoServo oil_gripper(oil_gripper_motor, oil_gripper_encoder);
+OilArmController oil_arm_controller(oil_lift, oil_gripper);
 
 const auto CONTROL_PERIOD = 10ms; // 制御周期 10ms
 Timer control_timer;
