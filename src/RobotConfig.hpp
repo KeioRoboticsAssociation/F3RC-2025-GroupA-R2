@@ -18,6 +18,11 @@ namespace RobotConfig {
     constexpr float COS_120 = -0.5f; // cos(120°)
     constexpr float SIN_120 = 0.866f; // sin(120°)
 
-} // namespace Variable
+    // 位置制御
+    constexpr float POS_CONTROL_KP = 1.0f; // 位置制御の比例ゲイン
+    constexpr float GOAL_THRESHOLD_M = 0.03f; // 目標位置到達の閾値 [m]
+    constexpr float GOAL_THRESHOLD_RAD = 0.03f; // 目標位置到達の閾値 [rad]
+
+} // namespace RobotConfig
 
 #endif // ROBOT_CONFIG_HPP

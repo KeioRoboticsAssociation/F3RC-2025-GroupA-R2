@@ -7,15 +7,13 @@ class WheelController
 {
 public:
     WheelController(const std::array<WheelConfig, N> &wheel_configs, const std::array<MotorController *, N> &motors, float max_speed = 10000)
-        : motors(motors), max_speed(max_speed)
+        : wheel_vectors(), max_speed(max_speed), motors(motors), current_twist{0.0f, 0.0f, 0.0f}
     {
         for (int i = 0; i < N; i++)
         {
             wheel_vectors[i] = getWheelVector(wheel_configs[i]);
             motors[i]->setTargetSpeed(0);
         }
-
-        current_twist = {0.0f, 0.0f, 0.0f}; // 初期化
     }
 
     // 速度指令の設定

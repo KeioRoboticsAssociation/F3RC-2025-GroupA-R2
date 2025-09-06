@@ -1,137 +1,92 @@
-#include "mbed.h"
-#include "Control/StateEstimator.hpp"
-#include "Control/BehaviorController.hpp"
-#include "Provider/WheelOdometry.hpp"
-#include "Provider/ImuOdometry.hpp"
-#include "Provider/Database.hpp"
-#include "Parts/Imu.hpp"
-#include "Parts/TimeOfFlightSensor.hpp"
-#include "Parts/LimitSwitch.hpp"
-#include "Parts/Encoder.hpp"
-#include "config.hpp"
+#include <mbed.h>
 
-// ===== センサ・デバイスのインスタンス化 =====
-Imu imu(PinsForSensor::IMU_SDA, PinsForSensor::IMU_SCL);
-TimeOfFlightSensor front_tof(PinsForSensor::TOF1), side_tof(PinsForSensor::TOF2);
-LimitSwitch front_limit(LimitSwitchPins::FRONT_LIMIT), side_limit(LimitSwitchPins::SIDE_LIMIT);
+#include "PinConfig.hpp"
+#include "RobotConfig.hpp"
 
-// エンコーダ（測定輪用）
-Encoder x_encoder(InterruptInPins::MEASURING_ENCODER1_A, DigitalInPins::MEASURING_ENCODER1_B);
-Encoder y_encoder(InterruptInPins::MEASURING_ENCODER2_A, DigitalInPins::MEASURING_ENCODER2_B);
+#include "OmniWheel.hpp"
+#include "Odometry.hpp"
 
-// WheelOdometry
-WheelOdometry wheel_odom(&x_encoder, &y_encoder, /*wheel_radius=*/0.03f, /*resolution=*/2048);
+UnbufferedSerial pc(USBTX, USBRX); // PCとのシリアル通信
 
-// Database
-Database db(imu, wheel_odom, front_tof, side_tof, front_limit, side_limit);
+DCMotor motor1(PinConfig::OMNI1_PWM, PinConfig::OMNI1_DIR);
+Encoder encoder1(PinConfig::OMNI1_ENC_A, PinConfig::OMNI1_ENC_B);
+DCMotor motor2(PinConfig::OMNI2_PWM, PinConfig::OMNI2_DIR);
+Encoder encoder2(PinConfig::OMNI2_ENC_A, PinConfig::OMNI2_ENC_B);
+DCMotor motor3(PinConfig::OMNI3_PWM, PinConfig::OMNI3_DIR);
+Encoder encoder3(PinConfig::OMNI3_ENC_A, PinConfig::OMNI3_ENC_B);
+OmniWheel omni(motor1, encoder1, motor2, encoder2, motor3, encoder3);
 
-// ImuOdometry
-ImuOdometry imu_odom(db);
+Encoder encoder4(PinConfig::ODO_X_ENC_A, PinConfig::ODO_X_ENC_B); // X方向測定輪
+Encoder encoder5(PinConfig::ODO_Y_ENC_A, PinConfig::ODO_Y_ENC_B); // Y方向測定輪
+Imu imu(PinConfig::IMU_SDA, PinConfig::IMU_SCL); // IMU
+Odometry odometry(encoder4, encoder5, imu);
 
-// StateEstimator
-StateEstimator state_estimator(db, wheel_odom, imu_odom);
+const auto CONTROL_PERIOD = 10ms; // 制御周期 10ms
+Timer control_timer;
 
-// PIDゲイン（frequencyはint）
-PIDGain x_gain{0.1f, 0.0f, 0.1f, 1};
-PIDGain y_gain{0.1f, 0.0f, 0.1f, 1};
-PIDGain angle_gain{0.1f, 0.0f, 0.1f, 1};
-
-BehaviorController controller(x_gain, y_gain, angle_gain);
-
-int log_cnt = 0;
+constexpr float TARGET_X = 0.5f; // 目標X座標 [m]
+constexpr float TARGET_Y = 0.0f; // 目標Y座標 [m]
+constexpr float TARGET_YAW = 0.0f; // 目標方位角 [rad]
 
 int main() {
-    printf("=== Robot Start ===\n");
+    pc.baud(9600);
 
-    constexpr float dt = 0.01f;
-    constexpr int dt_us = static_cast<int>(dt * 1e6);
+    // === 初期化シーケンス ===
+    printf("Robot initializing...\n");
+    if (!imu.init()) {
+        printf("IMU initialization failed!\n");
+        return -1;
+    }
+    omni.setParams(RobotConfig::WHEEL_RADIUS, RobotConfig::BODY_RADIUS, 
+                   RobotConfig::COUNTS_PER_REV,
+                   RobotConfig::KP, RobotConfig::KI, RobotConfig::KD);
+    odometry.reset();
+    printf("Initialization complete.\n");
 
-    // 自己位置の登録
-    state_estimator.resetCoordinateSystem();
-
-    // 目標位置 (0.0, 0.0) と目標角度 π/2 rad
-    controller.setTargetPosition(0.0, 2.0);
-    controller.setTargetAngle(0);
-
-    // ------------------------
-    // Pゲイン変化用 Timer
-    // ------------------------
-    Timer timer;
-    timer.start();
-
-    const float P_start = 0.1f;
-    const float P_end   = 1.5f;
-    const float duration = 30.0f; // 10秒かけて P を増加
-
+    control_timer.start();
     while (true) {
-        log_cnt = ++log_cnt % 100;
-        if (log_cnt == 0) {
-            printf("\n-----\n");
+        // --- 1. 周期管理 ---
+        // ループ１周にかかった時間を計算
+        float dt = std::chrono::duration_cast<std::chrono::microseconds>(control_timer.elapsed_time()).count() / 1000000.0f;
+        control_timer.reset();
+
+        // --- 2. 状態観測 (State Estimation) ---
+        odometry.update();
+        float current_x = odometry.getX();
+        float current_y = odometry.getY();
+        float current_theta = odometry.getThetaRad();
+
+        // --- 3. 高レベル制御 (Position Control) ---
+        // 目標までの誤差をワールド座標系で計算
+        float error_x = TARGET_X - current_x;
+        float error_y = TARGET_Y - current_y;
+        float distance_to_goal = sqrt(error_x * error_x + error_y * error_y);
+
+        float target_vx = 0.0f;
+        float target_vy = 0.0f;
+        float target_omega = 0.0f; // 今回は回転制御は行わない
+
+        // ゴールに到達していなければ、目標速度を計算
+        if (distance_to_goal > RobotConfig::GOAL_THRESHOLD_M) {
+            // ワールド座標系での誤差を、ロボット座標系での速度指令に変換
+            // これにより、ロボットは常にゴールの方を向いて進もうとする
+            target_vx = (error_x * cos(current_theta) + error_y * sin(current_theta)) * RobotConfig::POS_CONTROL_KP;
+            target_vy = (-error_x * sin(current_theta) + error_y * cos(current_theta)) * RobotConfig::POS_CONTROL_KP;
+        }
+        
+        // --- 4. 低レベル制御 (Velocity Control) ---
+        omni.move(target_vx, target_vy, target_omega);
+        omni.update(dt); // 速度PID制御を実行
+
+        // --- 5. デバッグ情報表示 (100msごとに表示) ---
+        static Timer debug_timer;
+        if (std::chrono::duration_cast<std::chrono::milliseconds>(debug_timer.elapsed_time()).count() > 100) {
+            printf("Pos: (%.2f, %.2f) Goal: (%.2f, %.2f) VelCmd: (%.2f, %.2f)\n",
+                   current_x, current_y, TARGET_X, TARGET_Y, target_vx, target_vy);
+            debug_timer.reset();
         }
 
-        // 状態推定
-        wheel_odom.update();
-        state_estimator.update(dt);
-
-        // 推定結果を BehaviorController に渡す
-        Pose2D pose = state_estimator.getRelativePosition();
-        auto vel = state_estimator.getVelocity();
-        auto acc = state_estimator.getAcceleration();
-        double ang_vel = state_estimator.getAngularVelocity();
-
-        if (log_cnt == 0) {
-            printf("IMU: yaw=%f, pitch=%f, roll=%f\n", imu.getYaw(), imu.getPitch(), imu.getRoll());
-
-            printf("Estimated Pose: x=%f, y=%f, theta=%f\n", pose.x, pose.y, pose.theta);
-            printf("Estimated Velocity: vx=%f, vy=%f\n", vel.first, vel.second);
-            printf("Estimated Acceleration: ax=%f, ay=%f\n", acc.first, acc.second);
-            printf("Estimated Angular Velocity: omega=%f\n", ang_vel);
-        }
-
-        controller.updateFromStateEstimator(state_estimator);
-
-        // ------------------------
-        // Pゲインをなめらかに変更
-        // ------------------------
-        float t = std::chrono::duration<float>(timer.elapsed_time()).count();
-        float alpha = t / duration;
-        if (alpha > 1.0f) alpha = 1.0f;
-        float P_gain = P_start + (P_end - P_start) * alpha;
-        controller.setPGain(P_gain);
-
-        // ------------------------
-        // モータ出力
-        // ------------------------
-        controller.setMotor();
-
-        // // デバッグ出力
-        if (log_cnt == 0) printf("time=%f, P=%f, pose=(%f,%f,%f)\n", t, P_gain, pose.x, pose.y, pose.theta);
-
-        // printf("IMU:%f",imu.getYaw());
-
-        // 周期待ち
-        wait_us(dt_us);
-
-
-        // if (10.0 > timer.read() == 5.0){
-        //     controller.stop();
-        //     wait_us(3000000);
-        //     float _y = state_estimator.getRelativePosition().y;
-        //     float _t = state_estimator.getRelativePosition().theta;
-        //     controller.setTargetPosition(3.0, _y);
-        //     controller.setTargetAngle(_t);
-        // }else if(timer.read() == 15.0){
-        //     controller.stop();
-        //     wait_us(3000000);
-        //     float _x = state_estimator.getRelativePosition().x;
-        //     float _y = state_estimator.getRelativePosition().y;
-        //     controller.setTargetPosition(_x,_y);
-        //     controller.setTargetAngle(90.0);
-        // }else if(timer.read() == 25){
-        //     controller.stop();
-        //     wait_us(3000000);
-        //     break;
-
-        // }
+        // 制御周期を維持するために待機
+        ThisThread::sleep_for(CONTROL_PERIOD);
     }
 }

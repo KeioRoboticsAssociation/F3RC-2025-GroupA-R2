@@ -14,14 +14,14 @@ std::array<WheelConfig, 3> config = {
         .wheel_theta = M_PI / 2 // 車輪の角度
     }, 
     WheelConfig{
-        .wheel_radius = WHEEL_RAD_, 
-        .wheel_x = - M_SQRT3 / 2.f * TREAD_RAD_,
-        .wheel_y = - 0.5f * TREAD_RAD_, 
+        .wheel_radius = WHEEL_RAD_,
+        .wheel_x = static_cast<float>(- M_SQRT3 / 2.f * TREAD_RAD_),
+        .wheel_y = - 0.5f * TREAD_RAD_,
         .wheel_theta = 7 * M_PI / 3
     }, 
     WheelConfig{
         .wheel_radius = WHEEL_RAD_, 
-        .wheel_x = + M_SQRT3 / 2.f * TREAD_RAD_, 
+        .wheel_x = static_cast<float>(+ M_SQRT3 / 2.f * TREAD_RAD_), 
         .wheel_y = - 0.5f * TREAD_RAD_,
         .wheel_theta = 11 * M_PI / 3
     }

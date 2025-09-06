@@ -4,20 +4,27 @@
 #include <PinNames.h>
 
 namespace PinConfig {
-    constexpr PinName M1_PWM = PA_0;
-    constexpr PinName M1_DIR = PA_4;
-    constexpr PinName M1_ENC_A = PA_9;
-    constexpr PinName M1_ENC_B = PA_8;
+    constexpr PinName OMNI1_PWM = PA_0;
+    constexpr PinName OMNI1_DIR = PA_4;
+    constexpr PinName OMNI1_ENC_A = PA_9;
+    constexpr PinName OMNI1_ENC_B = PA_8;
 
-    constexpr PinName M2_PWM = PA_1;
-    constexpr PinName M2_DIR = PB_0;
-    constexpr PinName M2_ENC_A = PB_13;
-    constexpr PinName M2_ENC_B = PB_14;
+    constexpr PinName OMNI2_PWM = PA_1;
+    constexpr PinName OMNI2_DIR = PB_0;
+    constexpr PinName OMNI2_ENC_A = PB_13;
+    constexpr PinName OMNI2_ENC_B = PB_14;
 
-    constexpr PinName M3_PWM = PB_2;
-    constexpr PinName M3_DIR = PB_15;
-    constexpr PinName M3_ENC_A = PC_10;
-    constexpr PinName M3_ENC_B = PD_2;
+    constexpr PinName OMNI3_PWM = PB_2;
+    constexpr PinName OMNI3_DIR = PB_15;
+    constexpr PinName OMNI3_ENC_A = PC_10;
+    constexpr PinName OMNI3_ENC_B = PD_2;
+
+    constexpr PinName ODO_X_ENC_A = PC_6; // 測定輪X方向エンコーダA相
+    constexpr PinName ODO_X_ENC_B = PA_7; // 測定輪X方向エンコーダB相
+    constexpr PinName ODO_Y_ENC_A = PB_7; // 測定輪Y方向エンコーダA相
+    constexpr PinName ODO_Y_ENC_B = PB_6; // 測定輪Y方向エンコーダB相   
+    constexpr PinName IMU_SDA = PC_12;
+    constexpr PinName IMU_SCL = PB_10;
 }
 
 
