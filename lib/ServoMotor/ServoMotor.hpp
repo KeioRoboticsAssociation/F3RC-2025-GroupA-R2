@@ -1,4 +1,6 @@
-#pragma once
+#ifndef SERVOMOTOR_HPP
+#define SERVOMOTOR_HPP
+
 #include <mbed.h>
 
 class Servo
@@ -12,3 +14,5 @@ public:
     void setPulseWidth(chrono::microseconds pulse_width);
     void setAngleDeg(float degrees);
 };
+
+#endif // SERVOMOTOR_HPP

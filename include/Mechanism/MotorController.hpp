@@ -1,6 +1,6 @@
 #pragma once
-#include "Parts/DCMotor.hpp"
-#include "Parts/Encoder.hpp"
+#include <DCMotor.hpp>
+#include <Encoder.hpp>
 #include "PIDController.hpp"
 #include "mbed.h"
 

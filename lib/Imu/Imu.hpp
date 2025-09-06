@@ -1,5 +1,7 @@
-#pragma once
-#include "mbed.h"
+#ifndef IMU_HPP
+#define IMU_HPP
+
+#include <mbed.h>
 
 // 3次元ベクトル用のシンプルな構造体
 struct Vector3
@@ -57,3 +59,5 @@ private:
     bool setOperationMode(uint8_t mode);
     bool setupAxisMapping();
 };
+
+#endif // IMU_HPP

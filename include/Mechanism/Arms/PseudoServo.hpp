@@ -1,8 +1,8 @@
 #pragma once
 #include <mbed.h>
-#include "Parts/DCMotor.hpp"
-#include "Parts/Encoder.hpp"
-#include "Parts/LimitSwitch.hpp"
+#include <DCMotor.hpp>
+#include <Encoder.hpp>
+#include <LimitSwitch.hpp>
 #include "Mechanism/PIDController.hpp"
 
 class PseudoServo

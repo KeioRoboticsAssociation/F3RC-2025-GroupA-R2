@@ -2,7 +2,7 @@
 // 測定輪から速度・加速度を算出するクラス
 //==================================================
 #pragma once
-#include "Parts/Encoder.hpp"
+#include <Encoder.hpp>
 #include "mbed.h" // Timerのために追加
 
 // 速度と加速度を格納する構造体

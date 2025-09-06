@@ -1,4 +1,6 @@
-#pragma once
+#ifndef DCMOTOR_HPP
+#define DCMOTOR_HPP
+
 #include <mbed.h>
 
 class DCMotor
@@ -16,3 +18,5 @@ private:
     bool direction;
     float last_duty;
 };
+
+#endif // DCMOTOR_HPP

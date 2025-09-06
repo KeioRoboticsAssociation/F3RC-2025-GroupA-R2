@@ -1,4 +1,6 @@
-#pragma once
+#ifndef ENCODER_HPP
+#define ENCODER_HPP
+
 #include <mbed.h>
 
 // 参考: https://keiorogiken.wordpress.com/2017/12/08/ロータリーエンコーダの話/
@@ -31,3 +33,5 @@ private:
     void interrupt(int sgn);
     void interrupt_reverse(int sgn);
 };
+
+#endif // ENCODER_HPP

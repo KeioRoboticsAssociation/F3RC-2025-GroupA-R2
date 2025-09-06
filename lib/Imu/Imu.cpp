@@ -1,4 +1,4 @@
-#include "Parts/Imu.hpp"
+#include "Imu.hpp"
 
 // BNO055のレジスタアドレスなどを定義
 #define BNO055_ADDRESS (0x28 << 1)

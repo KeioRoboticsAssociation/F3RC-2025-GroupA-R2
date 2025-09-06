@@ -1,4 +1,4 @@
-#include "Parts/TimeOfFlightSensor.hpp"
+#include "TimeOfFlightSensor.hpp"
 
 // 今回は閾値を一つしか用いない
 TimeOfFlightSensor::TimeOfFlightSensor(PinName q1) : _sensorPin(q1) {}

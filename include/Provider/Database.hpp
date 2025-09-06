@@ -1,9 +1,9 @@
 #pragma once
 #include <utility>
-#include "Parts/Imu.hpp"
-#include "Parts/LimitSwitch.hpp"
-#include "Parts/TimeOfFlightSensor.hpp"
-#include "Parts/Encoder.hpp"
+#include <Imu.hpp>
+#include <LimitSwitch.hpp>
+#include <TimeOfFlightSensor.hpp>
+#include <Encoder.hpp>
 #include "Provider/WheelOdometry.hpp"
 
 class Database

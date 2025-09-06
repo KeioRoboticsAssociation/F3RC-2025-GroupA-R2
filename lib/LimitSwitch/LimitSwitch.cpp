@@ -1,4 +1,4 @@
-#include "Parts/LimitSwitch.hpp"
+#include "LimitSwitch.hpp"
 
 LimitSwitch::LimitSwitch(PinName pin) : digitalIn(pin), lastState(false), currentState(false), lastEdgeState(false) {
     // タイマー開始

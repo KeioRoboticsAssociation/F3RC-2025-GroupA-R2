@@ -1,13 +1,13 @@
 #pragma once
-#include "Parts/DCMotor.hpp"
-#include "Parts/Encoder.hpp"
+#include <DCMotor.hpp>
+#include <Encoder.hpp>
 #include "Mechanism/PIDController.hpp"
 #include "Mechanism/Wheel.hpp"
 #include "Mechanism/WheelController.hpp"
 #include "Mechanism/MotorController.hpp"
 #include "config.hpp"
 #include "variable.hpp"
-#include "Parts/DCMotor.hpp"
+#include <DCMotor.hpp>
 #include "Control/StateEstimator.hpp"
 #include "Mechanism/WheelController.hpp"
 

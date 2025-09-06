@@ -1,7 +1,7 @@
 #ifndef COAL_ARM_CONTROLLER_HPP
 #define COAL_ARM_CONTROLLER_HPP
 
-#include "Parts/ServoMotor.hpp"
+#include <ServoMotor.hpp>
 #include "Mechanism/Arms/PseudoServo.hpp"
 
 class CoalArmController {
