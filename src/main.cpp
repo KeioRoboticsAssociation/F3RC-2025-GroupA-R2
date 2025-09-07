@@ -117,7 +117,7 @@ int main_3()
     };
 
     OdomWheel<3> odom_wheel(PIDGain{5, 0, 0, 100}, config, motor_controller, encoders);
-    odom_wheel.setTargetPose(Pose{0.0, 10.0, 0.0});
+    odom_wheel.setTargetPose(Pose{0.0, 1000.0, 0.0}); // 前方1m
 
     while (true)
     {
