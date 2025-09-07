@@ -9,7 +9,7 @@ CoalArmController::CoalArmController(PseudoServo& lift_motor, ServoMotor& grippe
 void CoalArmController::init() {
     m_lift_motor.setParams(
         RobotConfig::ARM1_LIFT_KP, RobotConfig::ARM1_LIFT_KI, RobotConfig::ARM1_LIFT_KD,
-        RobotConfig::ARM1_METERS_PER_REV, RobotConfig::ARM1_COUNTS_PER_REV
+        RobotConfig::ARM1_LIFT_METERS_PER_REV, RobotConfig::ARM1_LIFT_COUNTS_PER_REV
     );
     release(); // 最初は開いておく
 }
@@ -23,11 +23,11 @@ void CoalArmController::liftTo(float height_m) {
 }
 
 void CoalArmController::grab() {
-    m_gripper_servo.setAngleDeg(RobotConfig::ARM1_GRIPPER_CLOSE_DEG);
+    m_gripper_servo.setAngleDeg(RobotConfig::ARM1_GRIP_CLOSE_DEG);
 }
 
 void CoalArmController::release() {
-    m_gripper_servo.setAngleDeg(RobotConfig::ARM1_GRIPPER_OPEN_DEG);
+    m_gripper_servo.setAngleDeg(RobotConfig::ARM1_GRIP_OPEN_DEG);
 }
 
 bool CoalArmController::isLiftAtTarget(float tolerance_m) {

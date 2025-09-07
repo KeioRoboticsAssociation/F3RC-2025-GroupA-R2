@@ -1,64 +1,73 @@
 #ifndef ROBOT_CONFIG_HPP
 #define ROBOT_CONFIG_HPP
 
-#include <chrono>
 #include <cmath>
 
 namespace RobotConfig {
-    // ロボットの物理パラメータ
-    constexpr float WHEEL_RADIUS_M = 0.045f; // ホイールの半径 [m]
-    constexpr float BODY_RADIUS_M = 0.21f;  // 車体中心からホイール中心までの距離 [m]
-    constexpr int COUNTS_PER_REV = 2048; // モーター1回転あたりのエンコーダカウント数（ギア比考慮後）
+    // --- 数学定数 ---
+    constexpr float SQRT3 = 1.73205081f;
+    constexpr float PI = 3.14159265f;
 
-    // 制御周期
-    constexpr float CONTROL_PERIOD_S = 0.01f; // 10ms
+    // --- 物理パラメータ ---
+    constexpr float WHEEL_RADIUS_M = 0.05f;  // オムニホイールの半径 [m]
+    constexpr float BODY_RADIUS_M = 0.15f;   // 中心からホイールまでの距離 [m]
+    constexpr float COUNTS_PER_REV = 2048.0f; // モーター1回転のエンコーダカウント
 
-    // 円周率
-    constexpr float PI = M_PI;
+    // --- 測定輪パラメータ ---
+    constexpr float ODOM_WHEEL_RADIUS_M = 0.025f; // 測定輪の半径 [m]
+    constexpr float ODOM_COUNTS_PER_REV = 2048.0f; // 測定輪エンコーダの分解能
 
-    // 三角関数
-    constexpr float COS_120 = -0.5f; // cos(120°)
-    constexpr float SIN_120 = 0.866f; // sin(120°)
+    // === ★★★ IMUフィルタ パラメータ (追加) ★★★ ===
+    // ローパスフィルタの平滑化係数alpha。0に近いほど強く平滑化（動きが滑らかになるが反応は鈍る）、
+    // 1に近いほど生のデータに近い値（反応は速いがノイズは残りやすい）になります。
+    // まずはこの値で試し、反応が鈍いと感じたら少しずつ大きくしてみてください。
+    constexpr float IMU_FILTER_ALPHA = 0.1f;
+    
+    // === ★★★ 速度PIDゲイン (安定性重視) ★★★ ===
+    // KPを下げて振動を抑制。KIでトルクを補い、小さなKDで応答性を安定させます。
+    constexpr float KP = 0.05f;
+    constexpr float KI = 0.02f;
+    constexpr float KD = 0.001f;
 
-    // 位置制御
-    constexpr float POS_CONTROL_KP = 1.0f; // 位置制御の比例ゲイン
-    constexpr float ANGLE_CONTROL_KP = 2.0f; // 角度制御の比例ゲイン
-    constexpr float POS_THRESHOLD_M = 0.03f; // 目標位置到達の閾値 [m]
-    constexpr float ANGLE_THRESHOLD_RAD = 0.03f; // 目標位置到達の閾値 [rad]
+    // --- 位置制御パラメータ ---
+    constexpr float POS_CONTROL_KP = 1.5f;       // 直進制御のPゲイン
+    constexpr float GOAL_THRESHOLD_M = 0.02f;    // ゴール座標の許容誤差 (2cm)
 
-    // サーボ
-    constexpr chrono::microseconds SERVO_MIN_PULSE_WIDTH = 500us; // サーボの最小パルス幅 [μs]
-    constexpr chrono::microseconds SERVO_MAX_PULSE_WIDTH = 2500us; // サーボの最大パルス幅 [μs]
+    // --- ★★★ 角度制御パラメータ (安定性重視) ★★★ ===
+    // ANGLE_CONTROL_KPを大幅に下げ、回転時の振動とオーバーシュートを徹底的に抑制します。
+    constexpr float ANGLE_CONTROL_KP = 0.5f;     // 回転制御のPゲイン
+    constexpr float ANGLE_THRESHOLD_RAD = 0.05f; // ゴール角度の許容誤差 (約3度)
 
-    // オムニホイール PIDゲイン
-    constexpr float KP = 0.5f; // 比例ゲイン
-    constexpr float KI = 0.1f; // 積分ゲイン
-    constexpr float KD = 0.01f; // 微分ゲイン
+    // --- サーボモーター パラメータ ---
+    constexpr int SERVO_MIN_PULSE_WIDTH = 500;
+    constexpr int SERVO_MAX_PULSE_WIDTH = 2400;
 
-    // アーム1（石炭アーム）設定
-    constexpr float ARM1_LIFT_KP = 5.0f; // 昇降用PID比例ゲイン
-    constexpr float ARM1_LIFT_KI = 0.0f; // 昇降用PID積分ゲイン
-    constexpr float ARM1_LIFT_KD = 0.1f; // 昇降用PID微分ゲイン
-    constexpr float ARM1_METERS_PER_REV = 0.02f; // 昇降用モーターの1回転あたりの移動距離
-    constexpr int ARM1_COUNTS_PER_REV = 2048; // 昇降用モーターの1回転あたりのエンコーダカウント数
-    constexpr float ARM1_GRIPPER_OPEN_DEG = 45.0f; // グリッパーオープン角度
-    constexpr float ARM1_GRIPPER_CLOSE_DEG = -45.0f; // グリッパークローズ角度
+    // --- アーム1 (CoalArm) パラメータ ---
+    constexpr float ARM1_LIFT_KP = 20.0f;
+    constexpr float ARM1_LIFT_KI = 0.1f;
+    constexpr float ARM1_LIFT_KD = 0.3f;
+    constexpr float ARM1_LIFT_METERS_PER_REV = 0.05f;
+    constexpr float ARM1_LIFT_COUNTS_PER_REV = 3200.0f;
+    constexpr float ARM1_GRIP_OPEN_DEG = 90.0f;
+    constexpr float ARM1_GRIP_CLOSE_DEG = 20.0f;
 
-    // アーム2（石油アーム）設定
-    constexpr float ARM2_LIFT_KP = 5.0f; // 昇降用PID比例ゲイン
-    constexpr float ARM2_LIFT_KI = 0.0f; // 昇降用PID積分ゲイン
-    constexpr float ARM2_LIFT_KD = 0.1f; // 昇降用PID微分ゲイン
-    constexpr float ARM2_LIFT_METERS_PER_REV = 0.02f; // 昇降用モーターの1回転あたりの移動距離
-    constexpr int ARM2_LIFT_COUNTS_PER_REV = 2048; // 昇降用モーターの1回転あたりのエンコーダカウント数
-    constexpr float ARM_LIFT_HEIGHT_M = 0.15f; // アーム昇降の目標高さ [m]
-    constexpr float ARM2_GRIP_KP = 2.0f; // グリッパー用PID比例ゲイン
-    constexpr float ARM2_GRIP_KI = 0.0f; // グリッパー用PID積分ゲイン
-    constexpr float ARM2_GRIP_KD = 0.05f; // グリッパー用PID微分ゲイン
-    constexpr float ARM2_GRIP_METERS_PER_REV = 0.0005f; // グリッパー用モーターの1回転あたりの移動距離
-    constexpr int ARM2_GRIP_COUNTS_PER_REV = 2048; // グリッパー用モーターの1回転あたりのエンコーダカウント数
+    // --- アーム2 (OilArm) パラメータ ---
+    constexpr float ARM2_LIFT_KP = 20.0f;
+    constexpr float ARM2_LIFT_KI = 0.1f;
+    constexpr float ARM2_LIFT_KD = 0.3f;
+    constexpr float ARM2_LIFT_METERS_PER_REV = 0.05f;
+    constexpr float ARM2_LIFT_COUNTS_PER_REV = 3200.0f;
+    
+    constexpr float ARM2_GRIP_KP = 15.0f;
+    constexpr float ARM2_GRIP_KI = 0.1f;
+    constexpr float ARM2_GRIP_KD = 0.2f;
+    constexpr float ARM2_GRIP_METERS_PER_REV = 0.01f;
+    constexpr float ARM2_GRIP_COUNTS_PER_REV = 3200.0f;
     constexpr float ARM2_GRIP_OPEN_ANGLE_DEG = 30.0f; // グリッパーオープン角度
     constexpr float ARM2_GRIP_CLOSE_ANGLE_DEG = -30.0f; // グリッパークローズ角度
 
-} // namespace RobotConfig
+    // --- アーム共通動作パラメータ ---
+    constexpr float ARM_LIFT_HEIGHT_M = 0.1f; // アームを持ち上げる高さ (10cm)
+}
 
 #endif // ROBOT_CONFIG_HPP
