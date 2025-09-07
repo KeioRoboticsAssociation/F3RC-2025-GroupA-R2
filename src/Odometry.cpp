@@ -2,65 +2,91 @@
 #include "RobotConfig.hpp"
 #include <cmath>
 
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
-
 Odometry::Odometry(Encoder& encoder_x, Encoder& encoder_y, Imu& imu)
-    : m_encoder_x(encoder_x), m_encoder_y(encoder_y), m_imu(imu) 
+    : m_encoder_x(encoder_x), m_encoder_y(encoder_y), m_imu(imu)
 {
-    // パラメータを設定
-    if (RobotConfig::COUNTS_PER_REV > 0) {
-        float circumference = RobotConfig::WHEEL_RADIUS_M * 2 * M_PI;
-        m_meters_per_count = circumference / RobotConfig::COUNTS_PER_REV;
-    } else {
-        m_meters_per_count = 0.0f;
-    }
-
-    // 状態を初期化
     reset();
 }
 
-void Odometry::update() {
-    // 1. センサーから現在の値を取得
-    long current_count_x = m_encoder_x.getCount();
-    long current_count_y = m_encoder_y.getCount();
-    // IMUのYawをラジアンに変換して取得
-    m_theta = m_imu.getYaw() * (M_PI / 180.0f);
+void Odometry::update(float dt) {
+    if (dt <= 0) return;
 
-    // 2. 前回からのエンコーダの変化量を計算
-    long delta_count_x = current_count_x - m_prev_count_x;
-    long delta_count_y = current_count_y - m_prev_count_y;
+    // === 1. 測定輪エンコーダから移動距離(dx, dy)を計算 ===
+    int current_count_x = m_encoder_x.getCount();
+    int delta_count_x = current_count_x - m_prev_count_x;
+    m_prev_count_x = current_count_x;
+    float dx = (float)delta_count_x / RobotConfig::ODOM_COUNTS_PER_REV * (2.0f * RobotConfig::PI * RobotConfig::ODOM_WHEEL_RADIUS_M);
 
-    // 3. ロボット座標系での移動量 [m] を計算
-    // ※エンコーダの回転方向によって符号が逆になる場合は、-1を掛けて調整してください
-    float dx = (float)delta_count_x * m_meters_per_count;
-    float dy = (float)delta_count_y * m_meters_per_count;
+    int current_count_y = m_encoder_y.getCount();
+    int delta_count_y = current_count_y - m_prev_count_y;
+    m_prev_count_y = current_count_y;
+    float dy = (float)delta_count_y / RobotConfig::ODOM_COUNTS_PER_REV * (2.0f * RobotConfig::PI * RobotConfig::ODOM_WHEEL_RADIUS_M);
 
-    // 4. 座標変換：ロボット座標系の移動量をワールド座標系の移動量に変換
-    float dX = dx * cos(m_theta) - dy * sin(m_theta);
-    float dY = dx * sin(m_theta) + dy * cos(m_theta);
 
-    // 5. ワールド座標を更新
+    // === 2. IMUからヨー角を取得し、履歴を更新 ===
+    double yaw_deg = m_imu.getYaw();
+    m_theta_rad = yaw_deg * RobotConfig::PI / 180.0f;
+    auto current_time = Kernel::Clock::now().time_since_epoch().count();
+
+    m_yaw_history[m_history_index] = {m_theta_rad, current_time};
+    
+    int oldest_index = (m_history_index + 1) % RobotConfig::IMU_HISTORY_SIZE;
+    if (!m_history_filled && oldest_index == 0) {
+        m_history_filled = true;
+    }
+
+    // === 3. ヨー角の履歴から安定した角速度を計算 ===
+    if (m_history_filled) {
+        const auto& newest_data = m_yaw_history[m_history_index];
+        const auto& oldest_data = m_yaw_history[oldest_index];
+
+        float delta_yaw = newest_data.first - oldest_data.first;
+        uint32_t delta_tick = newest_data.second - oldest_data.second;
+        
+        // 角度の-PI~PIの回り込みを補正
+        if (delta_yaw > RobotConfig::PI) delta_yaw -= 2.0f * RobotConfig::PI;
+        if (delta_yaw < -RobotConfig::PI) delta_yaw += 2.0f * RobotConfig::PI;
+
+        float delta_t_sec = (float)delta_tick / (float)OS_TICK_FREQ;
+
+        if (delta_t_sec > 1e-6) { // ゼロ除算防止
+            m_filtered_angular_velocity = delta_yaw / delta_t_sec;
+        }
+    }
+    
+    m_history_index = oldest_index;
+
+    // === 4. ワールド座標系での位置を更新 ===
+    float dX = dx * cos(m_theta_rad) - dy * sin(m_theta_rad);
+    float dY = dx * sin(m_theta_rad) + dy * cos(m_theta_rad);
+    
     m_x += dX;
     m_y += dY;
-
-    // 6. 次回計算のために現在のエンコーダ値を保存
-    m_prev_count_x = current_count_x;
-    m_prev_count_y = current_count_y;
 }
 
-void Odometry::reset(float x, float y, float theta_rad) {
-    m_x = x;
-    m_y = y;
-    m_theta = theta_rad;
-    m_imu.resetYaw(); // IMUのヨー角もリセット
+void Odometry::reset() {
+    m_x = 0.0f;
+    m_y = 0.0f;
+    m_theta_rad = 0.0f;
+    
+    m_imu.resetYaw();
 
-    // エンコーダの現在値を初期値として設定
+    m_encoder_x.reset();
+    m_encoder_y.reset();
     m_prev_count_x = m_encoder_x.getCount();
     m_prev_count_y = m_encoder_y.getCount();
+    
+    m_history_index = 0;
+    m_history_filled = false;
+    m_filtered_angular_velocity = 0.0f;
+    // 履歴バッファを初期化
+    for(int i = 0; i < RobotConfig::IMU_HISTORY_SIZE; ++i) {
+        m_yaw_history[i] = {0.0f, 0};
+    }
 }
 
-float Odometry::getThetaDeg() const {
-    return m_theta * (180.0f / M_PI);
-}
+float Odometry::getX() const { return m_x; }
+float Odometry::getY() const { return m_y; }
+float Odometry::getThetaRad() const { return m_theta_rad; }
+float Odometry::getThetaDeg() const { return m_theta_rad * 180.0f / RobotConfig::PI; }
+float Odometry::getFilteredAngularVelocity() const { return m_filtered_angular_velocity; }
