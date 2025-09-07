@@ -29,7 +29,7 @@ int main_5()
     std::array<MotorController *, 5> motor_controller = {&motor1, &motor2, &motor3, &motor4, &motor5};
 
     // 足回り配置の設定　(ここでは駆動輪を測定輪として使用)
-    float WHEEL_RAD = 45.0;
+    float WHEEL_RAD = 30.0;
     float TREAD_RAD = 210.0;
     std::array<WheelConfig, 5> config = {
         WheelConfig{
@@ -92,7 +92,7 @@ int main_3()
     std::array<MotorController *, 3> motor_controller = {&motor1, &motor2, &motor3};
 
     // 足回り配置の設定　(ここでは駆動輪を測定輪として使用)
-    float WHEEL_RAD = 45.0;
+    float WHEEL_RAD = 30.0;
     float TREAD_RAD = 210.0;
     std::array<WheelConfig, 3> config = {
         // PI
@@ -127,6 +127,7 @@ int main_3()
         wait_us(10000); // 10ms
     }
 }
+
 int main_2()
 {
     // エンコーダーの初期化
@@ -160,7 +161,7 @@ void encoder_test()
     std::array<MotorController *, 3> motor_controller = {&motor1, &motor2, &motor3};
 
     // 足回り配置の設定　(ここでは駆動輪を測定輪として使用)
-    float WHEEL_RAD = 45.0;
+    float WHEEL_RAD = 30.0;
     float TREAD_RAD = 210.0;
     std::array<WheelConfig, 3> config = {
         // PI
