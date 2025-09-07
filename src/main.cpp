@@ -199,10 +199,27 @@ void encoder_test()
     }
 }
 
+void main_without_encoder()
+{
+    DCMotor dc1(PwmOutPins::OMUNI_MOTOR1_PWM, DigitalOutPins::OMUNI_MOTOR1_DIR);
+    DCMotor dc2(PwmOutPins::OMUNI_MOTOR2_PWM, DigitalOutPins::OMUNI_MOTOR2_DIR);
+    DCMotor dc3(PwmOutPins::OMUNI_MOTOR3_PWM, DigitalOutPins::OMUNI_MOTOR3_DIR);
+    dc2.setDuty(0.3);
+    dc3.setDuty(0.3);
+    wait_us(1000000); // 1s
+
+    dc3.stop();
+    wait_us(10000); // 10ms
+
+    dc3.setDuty(0.3);
+    wait_us(1000000);
+}
+
 int main()
 {
     // main_5();
     main_3();
     // main_2();
     // encoder_test();
+    // main_without_encoder();
 }
