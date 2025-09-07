@@ -40,12 +40,9 @@ namespace PinConfig {
     constexpr PinName ARM2_GRIPPER_DIR = PB_9; // DC6: 石油アーム掴み用モーター方向
     constexpr PinName ARM2_GRIPPER_ENC_A = PA_12; // ENC8: 石油アーム掴み用エンコーダA相
     constexpr PinName ARM2_GRIPPER_ENC_B = PC_5; // ENC8: 石油アーム掴み用エンコーダB相
-}
 
-namespace PinsForSensor
-{
-    constexpr PinName TOF1      = PC_1 ;       // 前方TOFセンサー
-    constexpr PinName TOF2      = PC_0 ;       // 側方TOFセンサー
+    constexpr PinName TOF1 = PC_1; // 前方TOFセンサー
+    constexpr PinName TOF2 = PC_0; // 側方TOFセンサー
 }
 
 #endif // PINCONFIG_HPP

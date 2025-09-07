@@ -2,13 +2,14 @@
 
 #include "PinConfig.hpp"
 #include "RobotConfig.hpp"
-
 #include "OmniWheel.hpp"
 #include "Odometry.hpp"
 #include "CoalArmController.hpp"
 #include "OilArmController.hpp"
+#include "TimeOfFlightSensor.hpp" // ★追加: 壁検知センサーのヘッダ
 
-UnbufferedSerial pc(USBTX, USBRX); // PCとのシリアル通信
+// PCとのシリアル通信
+UnbufferedSerial pc(USBTX, USBRX);
 
 // === ハードウェアインスタンス ===
 DCMotor motor1(PinConfig::OMNI1_PWM, PinConfig::OMNI1_DIR);
@@ -31,6 +32,9 @@ Encoder oil_lift_encoder(PinConfig::ARM2_LIFT_ENC_A, PinConfig::ARM2_LIFT_ENC_B)
 DCMotor oil_gripper_motor(PinConfig::ARM2_GRIPPER_PWM, PinConfig::ARM2_GRIPPER_DIR);
 Encoder oil_gripper_encoder(PinConfig::ARM2_GRIPPER_ENC_A, PinConfig::ARM2_GRIPPER_ENC_B);
 
+// ★追加: 壁検知センサー
+TimeOfFlightSensor front_tof(PinConfig::TOF1);
+
 // === ソフトウェアモジュール ===
 OmniWheel omni(motor1, encoder1, motor2, encoder2, motor3, encoder3);
 Odometry odometry(encoder4, encoder5, imu);
@@ -41,9 +45,6 @@ CoalArmController coal_arm_controller(coal_lift, coal_gripper_servo);
 PseudoServo oil_lift(oil_lift_motor, oil_lift_encoder);
 PseudoServo oil_gripper(oil_gripper_motor, oil_gripper_encoder);
 OilArmController oil_arm_controller(oil_lift, oil_gripper);
-
-const auto CONTROL_PERIOD = 10ms; // 制御周期 10ms
-Timer control_timer;
 
 // === 状態定義 ===
 enum class RobotState {
@@ -79,7 +80,7 @@ RobotState current_state = RobotState::INITIALIZING;
 
 // === 制御変数 ===
 const auto CONTROL_PERIOD = 10ms;
-Timer control_timer;
+Timer control_timer, state_timer;
 float target_x = 0.0f, target_y = 0.0f, target_theta = 0.0f;
 
 // === ヘルパー関数 ===
@@ -94,6 +95,8 @@ float normalize_angle(float angle) {
 void change_state(RobotState next_state, const char* state_name) {
     omni.move(0, 0, 0); // 安全のため状態遷移時に一度停止
     current_state = next_state;
+    state_timer.reset();
+    state_timer.start();
     printf("State -> %s\n", state_name);
 }
 
@@ -138,8 +141,13 @@ int main() {
         
         // --- ステートマシン ---
         switch (current_state) {
-            // === Step 1: 2m前進 ===
-            case RobotState::MOVE_FORWARD_1: {
+            case RobotState::MOVE_FORWARD_1: { // Step 1
+                // ★追加: 前方の壁を検知したらエラー状態に移行
+                if (front_tof.isDetecting()) {
+                    printf("Error: Wall detected in front!\n");
+                    change_state(RobotState::ERROR, "ERROR");
+                    break;
+                }
                 float error_x = target_x - current_x;
                 float error_y = target_y - current_y;
                 if (sqrt(error_x*error_x + error_y*error_y) < RobotConfig::POS_THRESHOLD_M) {
@@ -153,8 +161,7 @@ int main() {
                 break;
             }
 
-            // === Step 2: 左60度旋回 & アーム2動作 & 右60度旋回 ===
-            case RobotState::TURN_LEFT_60_A: {
+            case RobotState::TURN_LEFT_60_A: { // Step 2
                 float angle_error = normalize_angle(target_theta - current_theta);
                 if (abs(angle_error) < RobotConfig::ANGLE_THRESHOLD_RAD) {
                     oil_arm_controller.liftTo(RobotConfig::ARM_LIFT_HEIGHT_M);
@@ -193,8 +200,130 @@ int main() {
                 }
                 break;
             }
+            
+            case RobotState::MOVE_BACKWARD_1: { // Step 3
+                // ★注意: 後退時の壁検知は実装していません。
+                // もし後方にもセンサーがあれば同様に追加できます。
+                float error_x = target_x - current_x;
+                float error_y = target_y - current_y;
+                if (sqrt(error_x*error_x + error_y*error_y) < RobotConfig::POS_THRESHOLD_M) {
+                    target_theta = current_theta - RobotConfig::PI / 2.0f; // 右に90度
+                    change_state(RobotState::TURN_RIGHT_90, "TURN_RIGHT_90");
+                } else {
+                    // 符号を反転させることで後退
+                    float vx = (error_x * cos(current_theta) + error_y * sin(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    float vy = (-error_x * sin(current_theta) + error_y * cos(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    omni.move(vx, vy, 0);
+                }
+                break;
+            }
 
-            // ... 他のステップも同様に実装 ...
+                        case RobotState::TURN_RIGHT_90: { // Step 4
+                float angle_error = normalize_angle(target_theta - current_theta);
+                if (abs(angle_error) < RobotConfig::ANGLE_THRESHOLD_RAD) {
+                    target_x = current_x + 0.8f * cos(current_theta);
+                    target_y = current_y + 0.8f * sin(current_theta);
+                    change_state(RobotState::MOVE_FORWARD_2, "Step 5: MOVE_FORWARD_2 (0.8m)");
+                } else { omni.move(0, 0, angle_error * RobotConfig::ANGLE_CONTROL_KP); }
+                break;
+            }
+            case RobotState::MOVE_FORWARD_2: { // Step 5
+                if (front_tof.isDetecting()) {
+                    printf("Error: Wall detected!\n"); change_state(RobotState::ERROR, "ERROR"); break;
+                }
+                float error_x = target_x - current_x; float error_y = target_y - current_y;
+                if (sqrt(error_x*error_x + error_y*error_y) < RobotConfig::POS_THRESHOLD_M) {
+                    coal_arm_controller.liftTo(RobotConfig::ARM_LIFT_HEIGHT_M);
+                    change_state(RobotState::ARM1_LIFT_UP_A, "Step 6: ARM1_LIFT_UP_A");
+                } else {
+                    float vx = (error_x * cos(current_theta) + error_y * sin(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    float vy = (-error_x * sin(current_theta) + error_y * cos(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    omni.move(vx, vy, 0);
+                }
+                break;
+            }
+            case RobotState::ARM1_LIFT_UP_A: // Step 6
+                if (coal_arm_controller.isLiftAtTarget()) {
+                    coal_arm_controller.grab(); change_state(RobotState::ARM1_GRAB_A, "Step 6: ARM1_GRAB_A");
+                } break;
+            case RobotState::ARM1_GRAB_A:
+                if (std::chrono::duration_cast<std::chrono::milliseconds>(state_timer.elapsed_time()).count() > 500) {
+                    coal_arm_controller.liftTo(0.0f); change_state(RobotState::ARM1_LIFT_DOWN_A, "Step 6: ARM1_LIFT_DOWN_A");
+                } break;
+            case RobotState::ARM1_LIFT_DOWN_A:
+                if (coal_arm_controller.isLiftAtTarget()) {
+                    target_theta = normalize_angle(current_theta + RobotConfig::PI / 3.0f); // +60 deg
+                    change_state(RobotState::TURN_LEFT_60_B, "Step 7: TURN_LEFT_60_B");
+                } break;
+            case RobotState::TURN_LEFT_60_B: { // Step 7
+                float angle_error = normalize_angle(target_theta - current_theta);
+                if (abs(angle_error) < RobotConfig::ANGLE_THRESHOLD_RAD) {
+                    coal_arm_controller.liftTo(RobotConfig::ARM_LIFT_HEIGHT_M);
+                    change_state(RobotState::ARM1_LIFT_UP_B, "Step 7: ARM1_LIFT_UP_B");
+                } else { omni.move(0, 0, angle_error * RobotConfig::ANGLE_CONTROL_KP); }
+                break;
+            }
+            case RobotState::ARM1_LIFT_UP_B:
+                if (coal_arm_controller.isLiftAtTarget()) {
+                    coal_arm_controller.release(); change_state(RobotState::ARM1_RELEASE_B, "Step 7: ARM1_RELEASE_B");
+                } break;
+            case RobotState::ARM1_RELEASE_B:
+                if (std::chrono::duration_cast<std::chrono::milliseconds>(state_timer.elapsed_time()).count() > 500) {
+                    coal_arm_controller.liftTo(0.0f); change_state(RobotState::ARM1_LIFT_DOWN_B, "Step 7: ARM1_LIFT_DOWN_B");
+                } break;
+            case RobotState::ARM1_LIFT_DOWN_B:
+                if (coal_arm_controller.isLiftAtTarget()) {
+                    target_theta = normalize_angle(target_theta - RobotConfig::PI / 3.0f);
+                    change_state(RobotState::TURN_RIGHT_60_B, "Step 7: TURN_RIGHT_60_B");
+                } break;
+            case RobotState::TURN_RIGHT_60_B: {
+                float angle_error = normalize_angle(target_theta - current_theta);
+                if (abs(angle_error) < RobotConfig::ANGLE_THRESHOLD_RAD) {
+                    target_x = current_x + 0.8f * cos(current_theta);
+                    target_y = current_y + 0.8f * sin(current_theta);
+                    change_state(RobotState::MOVE_FORWARD_3, "Step 8: MOVE_FORWARD_3 (0.8m)");
+                } else { omni.move(0, 0, angle_error * RobotConfig::ANGLE_CONTROL_KP); }
+                break;
+            }
+            case RobotState::MOVE_FORWARD_3: { // Step 8
+                if (front_tof.isDetecting()) {
+                    printf("Error: Wall detected!\n"); change_state(RobotState::ERROR, "ERROR"); break;
+                }
+                float error_x = target_x - current_x; float error_y = target_y - current_y;
+                if (sqrt(error_x*error_x + error_y*error_y) < RobotConfig::POS_THRESHOLD_M) {
+                    target_theta = normalize_angle(current_theta + RobotConfig::PI / 2.0f); // +90 deg
+                    change_state(RobotState::TURN_LEFT_90, "Step 9: TURN_LEFT_90");
+                } else {
+                    float vx = (error_x * cos(current_theta) + error_y * sin(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    float vy = (-error_x * sin(current_theta) + error_y * cos(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    omni.move(vx, vy, 0);
+                }
+                break;
+            }
+            case RobotState::TURN_LEFT_90: { // Step 9
+                float angle_error = normalize_angle(target_theta - current_theta);
+                if (abs(angle_error) < RobotConfig::ANGLE_THRESHOLD_RAD) {
+                    target_x = current_x + 7.5f * cos(current_theta);
+                    target_y = current_y + 7.5f * sin(current_theta);
+                    change_state(RobotState::MOVE_FORWARD_4, "Step 10: MOVE_FORWARD_4 (7.5m)");
+                } else { omni.move(0, 0, angle_error * RobotConfig::ANGLE_CONTROL_KP); }
+                break;
+            }
+            case RobotState::MOVE_FORWARD_4: { // Step 10
+                if (front_tof.isDetecting()) {
+                    printf("Error: Wall detected!\n"); change_state(RobotState::ERROR, "ERROR"); break;
+                }
+                float error_x = target_x - current_x; float error_y = target_y - current_y;
+                if (sqrt(error_x*error_x + error_y*error_y) < RobotConfig::POS_THRESHOLD_M) {
+                    target_theta = normalize_angle(current_theta + RobotConfig::PI / 3.0f); // +60 deg
+                    change_state(RobotState::REPEAT_TURN_LEFT_60_A, "Step 11(2): REPEAT_TURN_LEFT_60_A");
+                } else {
+                    float vx = (error_x * cos(current_theta) + error_y * sin(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    float vy = (-error_x * sin(current_theta) + error_y * cos(current_theta)) * RobotConfig::POS_CONTROL_KP;
+                    omni.move(vx, vy, 0);
+                }
+                break;
+            }
 
             // === 最終状態 ===
             default:
@@ -209,6 +338,8 @@ int main() {
 
     if (current_state == RobotState::COMPLETE) {
         printf("--- Sequence Complete ---\n");
+    } else if (current_state == RobotState::ERROR) {
+        printf("--- Robot Stopped due to an Error ---\n");
     }
     omni.stop();
     return 0;
