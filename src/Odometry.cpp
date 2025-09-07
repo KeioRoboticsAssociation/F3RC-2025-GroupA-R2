@@ -11,7 +11,7 @@ Odometry::Odometry(Encoder& encoder_x, Encoder& encoder_y, Imu& imu)
 {
     // パラメータを設定
     if (RobotConfig::COUNTS_PER_REV > 0) {
-        float circumference = RobotConfig::WHEEL_RADIUS * 2 * M_PI;
+        float circumference = RobotConfig::WHEEL_RADIUS_M * 2 * M_PI;
         m_meters_per_count = circumference / RobotConfig::COUNTS_PER_REV;
     } else {
         m_meters_per_count = 0.0f;
