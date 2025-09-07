@@ -333,7 +333,7 @@ int main() {
         }
 
         // 周期維持
-        ThisThread::sleep_until(control_timer.read_high_resolution_us() + std::chrono::duration_cast<std::chrono::microseconds>(CONTROL_PERIOD).count());
+        ThisThread::sleep_until(control_timer.elapsed_time().count() + std::chrono::duration_cast<std::chrono::microseconds>(CONTROL_PERIOD).count());
     }
 
     if (current_state == RobotState::COMPLETE) {
