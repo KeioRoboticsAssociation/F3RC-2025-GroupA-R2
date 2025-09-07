@@ -242,11 +242,6 @@ void Imu::update_thread_worker()
                 delta_yaw += 360.0;
             }
             yaw_velocity = delta_yaw / dt;
-            extern int log_cnt;
-            if (log_cnt == 0) {
-                printf("Yaw: %.2f, Roll: %.2f, Pitch: %.2f, Yaw Velocity: %.2f, dt: %f\n",
-                       current_yaw, current_roll, current_pitch, yaw_velocity, dt);
-            }
         }
         dt_timer_.reset();
 
