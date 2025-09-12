@@ -53,7 +53,7 @@ public:
         for (int i = 0; i < N; i++)
         {
             motors[i]->setTargetSpeed(speeds[i]); // モーターに速度を設定
-            motors[i]->loop();
+            motors[i]->update();
         }
     }
 

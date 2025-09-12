@@ -16,7 +16,7 @@ public:
     void stop();
     float getSpeed();
     float getTargetSpeed();
-    void loop();
+    void update();
 
 private:
     Ticker ticker;

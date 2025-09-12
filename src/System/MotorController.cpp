@@ -6,7 +6,7 @@ MotorController::MotorController(DCMotor &motor, Encoder &encoder, PIDGain pid_g
     this->max_duty = max_duty; // 最大デューティ比を設定
 }
 
-void MotorController::loop()
+void MotorController::update()
 {
     if (!moving)
     {
