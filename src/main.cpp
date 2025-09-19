@@ -32,23 +32,23 @@ int main()
         // 前方
         WheelConfig{
             .wheel_radius = WHEEL_RAD, // ホイール半径
-            .wheel_x = 0.0,            // ホイールのx座標
+            .wheel_x = 0.0f,           // ホイールのx座標
             .wheel_y = TREAD_RAD,      // ホイールのy座標
-            .wheel_theta = M_PI / 2.0f // ホイールの向き
+            .wheel_theta = 0.0f        // ホイールの向き
         },
         // 左後方
         WheelConfig{
             .wheel_radius = WHEEL_RAD,
             .wheel_x = (float)-M_SQRT3 / 2.0f * TREAD_RAD,
             .wheel_y = -TREAD_RAD / 2.0f,
-            .wheel_theta = M_PI * 11.0f / 6.0f, // (4/3 + 1/2)pi
+            .wheel_theta = M_PI * 2.0f / 3.0f,
         },
         // 右後方
         WheelConfig{
             .wheel_radius = WHEEL_RAD,
             .wheel_x = (float)+M_SQRT3 / 2.0f * TREAD_RAD,
             .wheel_y = -TREAD_RAD / 2.0f,
-            .wheel_theta = M_PI * 7.0f / 6.0f, // (2/3 + 1/2)pi
+            .wheel_theta = M_PI * 4.0f / 3.0f,
         },
     };
 
