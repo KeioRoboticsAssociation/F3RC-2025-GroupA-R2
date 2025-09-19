@@ -35,7 +35,6 @@ void MotorController::update()
     }
 
     last_duty = duty;
-    printf("duty: %f\n", duty);
 
     // モーターへの出力
     motor.setDuty(duty);
