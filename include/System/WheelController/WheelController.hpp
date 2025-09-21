@@ -49,7 +49,7 @@ public:
     {
         std::array<float, N> speeds = twistToMotorSpeeds(twist);
 
-        printf("dc_target_speed: %f, %f, %f\n", speeds[0], speeds[1], speeds[2]);
+        printf("  dc_target_speed: %8.3f, %8.3f, %8.3f\n", speeds[0], speeds[1], speeds[2]);
         for (int i = 0; i < N; i++)
         {
             motors[i]->setTargetSpeed(speeds[i]); // モーターに速度を設定
